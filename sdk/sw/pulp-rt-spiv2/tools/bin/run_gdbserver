@@ -1,0 +1,1 @@
+plpbridge --chip=pulpissimo --cable=ftdi@digilent gdb wait --rsp-port=1234

@@ -1,0 +1,1 @@
+python bin/plp_mkflash --flash-boot-binary=../apps/hello/build/test/test --stimuli=flash_stim.slm --flash-type=spi --qpi --archi=pulpissimo --raw flash.bin -verbose

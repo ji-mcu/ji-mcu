@@ -1,0 +1,14 @@
+PULP_APP = test
+PULP_APP_SRCS = core_list_join.c core_main.c core_matrix.c core_state.c core_util.c
+
+PULP_APP_SRCS += pulp/core_portme.c 
+PULP_CFLAGS +=  -I$(CURDIR) -I$(CURDIR)/pulp
+
+PULP_CFLAGS += -DITERATIONS=10000
+#if ITERATIONS is too much (>1000), you should use sec timer
+PULP_CFLAGS += -DUSE_SEC_TIMER
+
+PULP_CFLAGS += -O3 -falign-functions=16 -funroll-all-loops
+PULP_CFLAGS += -DFLAGS_STR="\"NOT IMPLEMENTED\"" -DCLOCKS_PER_SEC=50000000 -DMULTITHREAD=1 -DCOMPILER_VERSION="\"na\"" -DCOMPILER_FLAGS="\"na\""
+
+include $(RISCV_RCP_SDK_PATH)/pulp_app.mk
