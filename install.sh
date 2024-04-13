@@ -31,3 +31,6 @@ rm liblto_plugin.so
 rm liblto_plugin.so.0
 ln -s liblto_plugin.so.0.0.0 liblto_plugin.so.0
 ln -s liblto_plugin.so.0.0.0 liblto_plugin.so
+
+# to build dir
+cd $PROJECT_DIR/sdk/sw/app/
