@@ -1,0 +1,38 @@
+1. pulp-debug-bridge的编译，
+  a. sudo pip3 install pyelftools
+  b. git clone https://github.com/pulp-platform/pulp-builder.git
+  c. git checkout 84d281c8e82157470d6604d4f221c5cf79a8cb53
+  d. git submodule update --init --recursive
+  e. 针对digilent线缆，修正代码
+  pulp-builder.git/pulp-debug-bridge/src/cables/ftdi/ftdi.cpp
+  Line 113:
+    ftdi_init(&m_ftdic);
+  改为
+    ftdi_init(&m_ftdic);
+    //changel channel from A to B to fit my jtag adapter
+  ftdi_set_interface(&m_ftdic,INTERFACE_B);
+  
+  f. 编译，./scripts/build-debug-bridge
+  g. 配置环境
+  #pulp debug bridge
+    
+  export PULP_DEBUG_BRIDGE=${PWD}/install
+  export PATH=${PULP_DEBUG_BRIDGE}/ws/bin:$PATH
+  export PYTHONPATH=${PULP_DEBUG_BRIDGE}/ws/python
+  export LD_LIBRARY_PATH=${PULP_DEBUG_BRIDGE}/ws/lib
+  export PULP_CONFIGS_PATH=${PULP_DEBUG_BRIDGE}/ws/configs
+
+2. pulp-debug-bridge/src/cables/adv_dbg_itf/adv_dbg_itf.cpp
+
+line 88  change the IR length
+  if (this->config->get("**/chip/name")->get_str() == "vega")
+  {
+    this->add_device(5, DEV_PROTOCOL_RISCV);
+    this->add_device(4, DEV_PROTOCOL_PULP);
+  }
+  else if (this->config->get("**/chip/name")->get_str() == "pulpissimo")
+  {
+    this->add_device(4, DEV_PROTOCOL_PULP);
+    // this->add_device(4, DEV_PROTOCOL_RISCV);
+  }
+

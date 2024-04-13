@@ -1,0 +1,13 @@
+#!/bin/bash -ex
+install_dir=$PWD/install
+ws_install_dir=$PWD/install/ws
+build_dir=$PWD/build
+
+export PATH=$ws_install_dir/bin:$PATH
+export PYTHONPATH=$ws_install_dir/python:$PYTHONPATH
+export PULP_CONFIGS_PATH=$ws_install_dir/configs
+
+
+make -C pulp-debug-bridge all install BUILD_DIR=$build_dir/pulp-debug-bridge INSTALL_DIR=$ws_install_dir TARGET_INSTALL_DIR=$install_dir
+
+

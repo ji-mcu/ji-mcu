@@ -1,0 +1,16 @@
+#!/bin/bash
+#wuzer
+echo "JTAG READ"
+
+if [ $# == 0 ]
+then
+	echo "READ ADDR:0x1c000000; SIZE:32 Bytes"
+	echo
+    plpbridge --chip=pulpissimo --cable=ftdi@digilent read --addr=0x1c000000 --size=32
+    echo
+    echo "HELP: you can run 'read_jtag' with different address/size, like: './read_jtag 0x1c000010 32'"
+else 
+	echo "READ ADDR:$1; SIZE:$2 Bytes"
+	echo
+    plpbridge --chip=pulpissimo --cable=ftdi@digilent read --addr=$1 --size=$2
+fi

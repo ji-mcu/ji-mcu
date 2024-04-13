@@ -1,0 +1,16 @@
+#!/bin/bash
+#wuzer
+echo "JTAG WRITE"
+
+if [ $# == 0 ]
+then
+	echo "WRITE ADDR:0x1c000000; SIZE:32 Bytes; VALUE:0x12345678"
+	echo
+    plpbridge --chip=pulpissimo --cable=ftdi@digilent write --addr=0x1c000000 --size=32 --value=0x12345678
+    echo
+    echo "HELP: you can run 'write_jtag' with different address/size/value, like: './write_jtag 0x1c000010 32 0x15263738'"
+else 
+	echo "WRITE ADDR:$1; SIZE:$2 Bytes; VALUE:$3"
+	echo
+    plpbridge --chip=pulpissimo --cable=ftdi@digilent write --addr=$1 --size=$2 --value=$3
+fi

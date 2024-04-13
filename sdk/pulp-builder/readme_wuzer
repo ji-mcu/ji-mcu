@@ -1,0 +1,38 @@
+
+################For Build
+Ubuntu 16.04 distribution, here are the commands to be executed to get all required dependencies:
+
+    $ sudo apt install git python3-pip gawk texinfo libgmp-dev libmpfr-dev libmpc-dev swig3.0 libjpeg-dev lsb-core doxygen python-sphinx sox graphicsmagick-libmagick-dev-compat libsdl2-dev libswitch-perl libftdi1-dev cmake scons libsndfile1-dev
+    $ sudo pip3 install twisted prettytable pyelftools openpyxl xlsxwriter pyyaml numpy configparser pyvcd
+    $ sudo pip2 install configparser
+
+
+##############Config
+1. sudo apt-get install libftdi1-dev
+
+2. cp 10-ftdi.rules /etc/udev/rules.d/
+
+3. sudo udevadm control --reload-rules && sudo udevadm trigger
+
+4. sudo pip3 install pyelftools
+
+5. id username             //   The user should also need to be in the "plugdev" group
+
+##############USAGE
+source set_env.sh
+
+./write_jtag    //write data with JTAG,containing plpbridge CMD below
+
+./read_jtag     //read data with JTAG,containing plpbridge  CMD below
+
+##############plpbridge
+plpbridge --help
+
+######read
+plpbridge --chip=pulpissimo --cable=ftdi@digilent read --addr=0x1c000000 --size=32
+
+######write
+plpbridge --chip=pulpissimo --cable=ftdi@digilent write --addr=0x1c000000 --size=32 --value=0x12345678
+
+#######The RSP server for the GDB connection can be started with this command:
+plpbridge --chip=pulpissimo --cable=ftdi@digilent gdb wait --rsp-port=1234

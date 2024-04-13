@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#wuzer
+echo "Rebuild Runtime and Plpbridge"
+
+echo "Clean old!"
+./scripts/clean
+
+echo "Build Runtime!"
+./scripts/build-runtime
+
+echo "Build Plpbridge!"
+
+./scripts/build-debug-bridge
+
+echo "Build Done!"
