@@ -12,17 +12,10 @@ pip -U install sphinx
 # modify authority
 sudo chmod 777 -R ./sdk
 
-# env
-# 配置交叉编译链环境
-cd sdk/
-source set_toolschain_env.sh
-# 编译环境
-cd sw/
-source pulp-rt-spiv2/configs/pulpissimo.sh
-
 # fix local env
 cd $PROJECT_DIR
 sudo ln -s /usr/lib/x86_64-linux-gnu/libmpfr.so.6 /usr/lib/x86_64-linux-gnu/libmpfr.so.4
+echo "has fixed local env"
 
 # fix toolchain
 cd $PROJECT_DIR
@@ -31,6 +24,4 @@ rm liblto_plugin.so
 rm liblto_plugin.so.0
 ln -s liblto_plugin.so.0.0.0 liblto_plugin.so.0
 ln -s liblto_plugin.so.0.0.0 liblto_plugin.so
-
-# to build dir
-cd $PROJECT_DIR/sdk/sw/app/
+echo "has fixed toolchain"
