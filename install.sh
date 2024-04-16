@@ -25,3 +25,6 @@ rm liblto_plugin.so.0
 ln -s liblto_plugin.so.0.0.0 liblto_plugin.so.0
 ln -s liblto_plugin.so.0.0.0 liblto_plugin.so
 echo "has fixed toolchain"
+
+# return to project dir
+cd $PROJECT_DIR
