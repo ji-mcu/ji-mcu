@@ -15,12 +15,14 @@ runner_build_dir := $(join $(makefile_dir),sdk/sw/runner) # runner build dir
 app_build_dir := $(join $(makefile_dir),sdk/sw/apps/) # app build dir, you need add an app name to the end of this path
 APPNAME := temp # app name
 
+pulp_build_dir := $(join $(makefile_dir),sdk/pulp-builder) # pulp build dir
+
 SHELL := /bin/bash
 
 # make all
 all: build
 
-build: boot_build runner_build app_build
+build: boot_build runner_build app_build pulp_build
 
 boot_build:
 	@echo "Building boot code..."
@@ -38,6 +40,9 @@ RISCV_RCP_SDK_PATH_ENV := $(join $(makefile_dir),sdk/sw/pulp-rt-spiv2)
 app_build:
 	@echo "Building app code..."
 	source env.sh ; $(V)$(make_cmd) -e -C $(join $(app_build_dir),$(APPNAME)) RISCV_RCP_SDK_PATH=$(RISCV_RCP_SDK_PATH_ENV)
-	
 
-.PHONY: all build boot_build runner_build app_build
+pulp_build:
+	@echo "Building pulp ..."
+	cd $(pulp_build_dir) ; source env.sh ; source configs/pulp.sh ; sudo chmod 777 scripts/bulid-runtime ; sudo ./scripts/build-runtime ; \
+
+.PHONY: all build boot_build runner_build app_build pulp_build

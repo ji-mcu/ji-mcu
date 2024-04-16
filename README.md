@@ -28,4 +28,4 @@
 
 ## build
 
-- 我写了一个 makefile，使用`make all`可以编译 bootcode、runner，添加如`make all APPNAME=temp`可以编译 APP，并且无需修改`RISCV_RCP_PATH`
+- 我写了一个 makefile，使用`make all`可以编译 bootcode、runner，添加如`make all APPNAME=temp`可以编译 APP，并且无需修改`RISCV_RCP_PATH`，直接`make all`后默认是`APPNAME=temp`，同时也会编译顺便 pulp-builder，如果你只想编译 pulp-builder，就输入`make pulp_build`
