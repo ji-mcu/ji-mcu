@@ -28,4 +28,13 @@
 
 ## build
 
-- 我写了一个 makefile，使用`make all`可以编译 bootcode、runner，添加如`make all APPNAME=temp`可以编译 APP，并且无需修改`RISCV_RCP_PATH`，直接`make all`后默认是`APPNAME=temp`，同时也会编译顺便 pulp-builder，如果你只想编译 pulp-builder，就输入`make pulp_build`
+- 我写了一个 makefile，使用`make all`可以编译 bootcode、runner，添加如`make all APPNAME=temp`可以编译 APP，并且无需修改`RISCV_RCP_PATH`
+
+- 直接`make all`后默认是`APPNAME=temp`，同时也会顺便编译 pulp-builder，如果你只想编译 pulp-builder，就输入`make pulp_build`
+
+## pulp_build issue：
+
+- 如果你的环境配置不同，可能无法正确编译 pulp，这时：
+
+  - 进入这些目录：`sdk/pulp-builder/json-tools`、`sdk/pulp-builder/pulp-configs`
+  - 分别执行`cmake CMakeLists.txt`，这样就可以生成对应的 makefile，之后再进行`make pulp_build`就行了
