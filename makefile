@@ -31,11 +31,13 @@ runner_build:
 	@echo "Building runner code..."
 	source env.sh ; $(V)$(make_cmd) -e -C $(runner_build_dir)
 	
+# APP env
+RISCV_RCP_SDK_PATH_ENV := $(join $(makefile_dir),sdk/sw/pulp-rt-spiv2)
 
 # add an app name to the end of this path, such as make all APPNAME=temp
 app_build:
 	@echo "Building app code..."
-	source env.sh ; $(V)$(make_cmd) -e -C $(join $(app_build_dir),$(APPNAME))
+	source env.sh ; $(V)$(make_cmd) -e -C $(join $(app_build_dir),$(APPNAME)) RISCV_RCP_SDK_PATH=$(RISCV_RCP_SDK_PATH_ENV)
 	
 
 .PHONY: all build boot_build runner_build app_build

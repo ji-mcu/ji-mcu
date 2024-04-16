@@ -28,4 +28,4 @@
 
 ## build
 
-- 我写了一个 makefile，使用`make all`可以编译 bootcode、runner，添加如`make all APPNAME=temp`可以编译 APP
+- 我写了一个 makefile，使用`make all`可以编译 bootcode、runner，添加如`make all APPNAME=temp`可以编译 APP，并且无需修改`RISCV_RCP_PATH`
