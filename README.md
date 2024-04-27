@@ -1,4 +1,5 @@
 # ji_mcu
+因为人工审核需要升级到team billing，所以无法配置人工审核，请自觉到对应的分支开发。
 
 ## quickly start：
 
