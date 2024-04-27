@@ -1,5 +1,5 @@
 # ji_mcu
-因为人工审核需要升级到team billing，所以无法配置人工审核，请自觉到对应的分支开发。
+请自觉到对应分支开发，已经配置pull requests，代码会审核，写完代码后记得写wiki.
 
 ## quickly start：
 
