@@ -1,5 +1,6 @@
 # ji_mcu
-请自觉到对应分支开发，已经配置pull requests，代码会审核，写完代码后记得写wiki.
+
+请自觉到对应分支开发，已经配置 pull requests，代码会审核，写完代码后记得写 wiki.
 
 ## quickly start：
 
@@ -29,9 +30,9 @@
 
 ## build
 
-- 我写了一个 makefile，使用`make all`可以编译 bootcode、runner，添加如`make all APPNAME=temp`可以编译 APP，并且无需修改`RISCV_RCP_PATH`
+- 我写了一个 makefile，使用`make all`可以编译 bootcode、runner，添加如`make all APPNAME=vendor`可以编译 APP，并且无需修改`RISCV_RCP_PATH`
 
-- 直接`make all`后默认是`APPNAME=temp`，同时也会顺便编译 pulp-builder，如果你只想编译 pulp-builder，就输入`make pulp_build`
+- 直接`make all`后默认是`APPNAME=vendor`，同时也会顺便编译 pulp-builder，如果你只想编译 pulp-builder，就输入`make pulp_build`
 
 ## pulp_build issue：
 
