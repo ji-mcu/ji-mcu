@@ -34,7 +34,10 @@
 
 - 直接`make all`后默认是`APPNAME=vendor`，同时也会顺便编译 pulp-builder，如果你只想编译 pulp-builder，就输入`make pulp_build`
 
+- 用`make run APPNAME=<比如vendor>`可以直接生成 flash 比特流
+
 - 我添加了一个 vendor 目录，所有的代码都可以在这个目录下写，入口函数应该就是 main.c 里的 main 函数，我们可以在 main.c 里调用 src 目录的函数，添加功能就行了，比如我就添加了一个 gpio
+
 - 源文件好像有 bug，它的 printf 好像不能添加变量，一添加就链接不了，还是直接用 uart 吧
 
 ## pulp_build issue：
