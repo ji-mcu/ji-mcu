@@ -57,3 +57,5 @@
 
   - 尝试下载 git-lfs 后，再次克隆仓库
 
+- ③`bin\plp_mkflash`问题：
+  -尝试换成 python3，改 makefile 文件最后为`python3 bin/plp_mkflash --flash ...... `
