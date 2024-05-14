@@ -46,3 +46,14 @@
 
   - 进入这些目录：`sdk/pulp-builder/json-tools`、`sdk/pulp-builder/pulp-configs`
   - 分别执行`cmake CMakeLists.txt`，这样就可以生成对应的 makefile，之后再进行`make pulp_build`就行了
+
+## 常见问题：
+
+- ①`no module name elftool`：
+
+  - 尝试：`sudo pip3 install pyelftools`
+
+- ②cc1 问题：
+
+  - 尝试下载 git-lfs 后，再次克隆仓库
+
