@@ -32,7 +32,7 @@
 
 - 我写了一个 makefile，使用`make all`可以编译 bootcode、runner，添加如`make all APPNAME=vendor`可以编译 APP，并且无需修改`RISCV_RCP_PATH`
 
-- 直接`make all`后默认是`APPNAME=vendor`，同时也会顺便编译 pulp-builder，如果你只想编译 pulp-builder，就输入`make pulp_build`
+- 直接`make all`后默认是`APPNAME=vendor`，现在只会编译 app，如果你想编译 pulp-builder，就输入`make pulp_build`
 
 - 用`make run APPNAME=<比如vendor>`可以直接生成 flash 比特流
 

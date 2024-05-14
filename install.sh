@@ -9,6 +9,12 @@ sudo apt install git python3-pip gawk texinfo libgmp-dev libmpfr-dev libmpc-dev 
 sudo pip3 install twisted prettytable pyelftools openpyxl xlsxwriter pyyaml numpy configparser pyvcd
 pip -U install sphinx
 
+# solve the problem of lfs
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+sudo apt install git-lfs
+git lfs install
+git lfs fetch
+
 # modify authority
 sudo chmod 777 -R ./sdk
 
