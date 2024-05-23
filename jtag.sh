@@ -48,6 +48,7 @@ if [ $# == 1 ] && [ $1 == "-f" ]; then # if input "./jtag.sh -f" then flash the 
     data_base=$(echo $data_area | awk -F "base: " '{print $2}' | awk -F ", size" '{print $1}')     # get the base of "Area 0:"
     data_size=$(echo $data_area | awk -F "size: " '{print $2}' | awk -F ", nbBlocks" '{print $1}') # get the size of "Area 0:"
     data_size_decimal=$(printf "%d" $data_size)                                                    # convert hex to decimal
+    data_size_bits=$(($data_size_decimal * 8))                                                     # convert decimal to bits
     echo "data_offset: $data_offset, data_base: $data_base, data_size: $data_size_decimal"
 
     # flash instruction area
@@ -58,6 +59,7 @@ if [ $# == 1 ] && [ $1 == "-f" ]; then # if input "./jtag.sh -f" then flash the 
     inst_base=$(echo $inst_area | awk -F "base: " '{print $2}' | awk -F ", size" '{print $1}')     # get the base of "Area 1:"
     inst_size=$(echo $inst_area | awk -F "size: " '{print $2}' | awk -F ", nbBlocks" '{print $1}') # get the size of "Area 1:"
     inst_size_decimal=$(printf "%d" $inst_size)                                                    # convert hex to decimal
+    inst_size_bits=$(($inst_size_decimal * 8))                                                     # convert decimal to bits
     echo "inst_offset: $inst_offset, inst_base: $inst_base, inst_size: $inst_size_decimal"
 
     # flash bitstream hex file
@@ -75,8 +77,8 @@ if [ $# == 1 ] && [ $1 == "-f" ]; then # if input "./jtag.sh -f" then flash the 
     echo "data1: $data1"
 
     # jtag write
-    ./write_jtag $data_base $data_size_decimal $data0
-    ./write_jtag $inst_base $inst_size_decimal $data1
+    ./write_jtag $data_base $data_size_bits $data0
+    ./write_jtag $inst_base $inst_size_bits $data1
 
     exit 0
 fi
