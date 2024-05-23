@@ -60,7 +60,7 @@ clean:
 PULP_APP_NAME := $(APPNAME)
 run:
 	@echo "Running flash making..."
-	source env.sh && cd $(runner_build_dir) && python bin/plp_mkflash --flash-boot-binary=$(join $(join $(join $(app_build_dir),$(APPNAME)),/build/$(PULP_APP_NAME)),/$(PULP_APP_NAME))  --stimuli=flash_stim.slm --flash-type=spi --qpi --archi=pulpissimo --raw flash.bin --verbose
+	source env.sh && cd $(runner_build_dir) && python bin/plp_mkflash --flash-boot-binary=$(join $(join $(join $(app_build_dir),$(APPNAME)),/build/$(PULP_APP_NAME)),/$(PULP_APP_NAME))  --stimuli=flash_stim.slm --flash-type=spi --qpi --archi=pulpissimo --raw flash.bin --verbose | tee out.txt
 	@echo "dir is $(runner_build_dir)"
 
 .PHONY: all build app_build build_other boot_build runner_build pulp_build run
