@@ -1,6 +1,6 @@
 # ji_mcu
 
-请自觉到对应分支开发，已经配置 pull requests，代码会审核，写完代码后记得写 wiki.
+请自觉到对应分支开发，已经配置 pull requests，代码会审核，写完代码后记得写 [wiki](https://github.com/ji-mcu/ji-mcu/wiki).
 
 ## quickly start：
 
