@@ -86,3 +86,12 @@ if [ $# == 1 ] && [ $1 == "-r" ]; then
     echo "JTAG REGS"
     exit 0
 fi
+
+# if input "./jtag.sh -h" or "./jtag.sh --help" then show help
+if [ $# == 1 ] && ([ $1 == "-h" ] || [ $1 == "--help" ]); then
+    echo "Usage: ./jtag.sh [OPTION]"
+    echo "  -f, --flash    flash the bitstream"
+    echo "  -r, --regs     show the regs"
+    echo "  -h, --help     display this help and exit"
+    exit 0
+fi
