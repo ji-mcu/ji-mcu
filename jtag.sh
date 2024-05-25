@@ -85,7 +85,15 @@ fi
 
 # if input "./jtag.sh -r" then show the regs
 if [ $# == 1 ] && [ $1 == "-r" ]; then
-    echo "JTAG REGS"
+    echo "JTAG REGS: "
+    # 1.BOOT_ADDR 0x1A100_1004 0x1A00_0000 R/W
+    echo "BOOT_ADDR addr in 0x1A1001004: "
+    ./read_jtag 0x1A1001004 32
+
+    # 2.MCU 启动使能寄存器：FETCH 0x1A100_1008 0x1 R/W
+    echo "MCU FETCH addr in 0x1A1001008: "
+    ./read_jtag 0x1A1001008 32
+
     exit 0
 fi
 
