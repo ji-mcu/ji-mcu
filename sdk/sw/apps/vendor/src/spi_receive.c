@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "pulp.h"
+#include "pulp.h" // sdk/sw/pulp-rt-spiv2/include/archi/udma/spim/udma_spim_v2.h 
 
 #define CMD_SIZE 7
 #define DATA_SIZE 32
