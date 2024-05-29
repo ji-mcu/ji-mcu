@@ -4,8 +4,8 @@ PULP_APP = vendor # 最终文件
 MAKEFILE_APP_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 # 查找src/下的所有.c文件和main.c文件
-PULP_APP_SRCS = $(wildcard src/*.c)
-PULP_APP_SRCS += main.c
+PULP_APP_SRCS = main.c
+PULP_APP_SRCS += $(wildcard src/*.c)
 
 # 添加头文件路径
 PULP_CFLAGS = -O3 -g -I$(join $(MAKEFILE_APP_DIR),include)
