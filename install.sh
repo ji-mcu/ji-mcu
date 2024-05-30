@@ -18,6 +18,7 @@ git lfs fetch
 
 # modify authority
 sudo chmod 777 -R ./sdk
+sudo chmod 777 -R ./jtag.sh
 
 # fix local env
 cd $PROJECT_DIR
