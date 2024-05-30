@@ -68,12 +68,16 @@ if [ $# == 1 ] && [ $1 == "-f" ]; then # if input "./jtag.sh -f" then flash the 
     data0=$(sed -n "$((data_offset_decimal + 1)),$((data_offset_decimal + data_size_decimal))p" $OUT_FLASH_FILE | tr -d '\n')
     # at the top add "0x"
     data0="0x$data0"
+    # data0 at raw data such as "0x00000000", need to remove space 、@、or other characters
+    data0=$(echo $data0 | tr -d '[:space:]')
     echo "data0: $data0"
 
     # offset 2: search from offset decimal line to the size decimal，and joint together
     data1=$(sed -n "$((inst_offset_decimal + 1)),$((inst_offset_decimal + inst_size_decimal))p" $OUT_FLASH_FILE | tr -d '\n')
     # at the top add "0x"
     data1="0x$data1"
+    # data1 at raw data such as "0x00000000", need to remove space 、@、or other characters
+    data1=$(echo $data1 | tr -d '[:space:]')
     echo "data1: $data1"
 
     # jtag write
