@@ -86,7 +86,7 @@ all = re.sub(r"@([0-9a-fA-F]+)", "", out_flash)
 all = re.sub(r" ", "", all)
 
 # find area in <OUT_FLASH_FILE>
-data0 = all.split("\n")[data_offset_decimal -1 : data_offset_decimal + data_size_decimal]
+data0 = all.split("\n")[data_offset_decimal : data_offset_decimal + data_size_decimal]
 data0 = "".join(data0)
 data0 = "0x" + data0
 data0 = re.sub(r"\s+", "", data0)
@@ -99,7 +99,7 @@ for i in range(0, len(data0), 2):
     data0 = data0[:i] + data0[i+1] + data0[i] + data0[i+2:]
 data0 = "0x" + data0
 
-data1 = all.split("\n")[inst_offset_decimal -1 : inst_offset_decimal + inst_size_decimal]
+data1 = all.split("\n")[inst_offset_decimal : inst_offset_decimal + inst_size_decimal]
 data1 = "".join(data1)
 data1 = "0x" + data1
 data1 = re.sub(r"\s+", "", data1)
@@ -122,4 +122,8 @@ os.system("./write_jtag %s %d %s" % ('0x'+ data_base.group(1), data_size_bits, d
 # write data1
 os.system("./write_jtag %s %d %s" % ('0x'+ inst_base.group(1), inst_size_bits, data1))
 
+# wirte start
+os.system("./write_jtag %s %d %s" % ('0x1A101004' , 32, '0x'+ inst_base.group(1)))
+os.system("./write_jtag %s %d %s" % ('0x1A101008' , 8, '0x00'))
+os.system("./write_jtag %s %d %s" % ('0x1A101008' , 8, '0x01'))
 
