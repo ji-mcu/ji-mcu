@@ -39,51 +39,7 @@ source ./set_env.sh
 # ...
 
 if [ $# == 1 ] && [ $1 == "-f" ]; then # if input "./jtag.sh -f" then flash the bitstream
-    echo "search for $OUT_SIM_FILE"
-    # flash data area
-    echo "JTAG FLASH data..."                                                                      # search and find Area 0: offset: 0x800, base: 0x1c000004, size: 0x44, nbBlocks: 1
-    data_area=$(grep -n "Area 0:" $OUT_SIM_FILE)                                                   # get the line number of "Area 0:"
-    data_offset=$(echo $data_area | awk -F "offset: " '{print $2}' | awk -F ", base" '{print $1}') # get the offset of "Area 0:"
-    data_offset_decimal=$(printf "%d" $data_offset)                                                # convert hex to decimal
-    data_base=$(echo $data_area | awk -F "base: " '{print $2}' | awk -F ", size" '{print $1}')     # get the base of "Area 0:"
-    data_size=$(echo $data_area | awk -F "size: " '{print $2}' | awk -F ", nbBlocks" '{print $1}') # get the size of "Area 0:"
-    data_size_decimal=$(printf "%d" $data_size)                                                    # convert hex to decimal
-    data_size_bits=$(($data_size_decimal * 8))                                                     # convert decimal to bits
-    echo "data_offset: $data_offset, data_base: $data_base, data_size: $data_size_decimal"
-
-    # flash instruction area
-    echo "JTAG FLASH instruction..."                                                               # search and find Area 1: offset: 0x1000, base: 0x1c020000, size: 0x2ac, nbBlocks: 1
-    inst_area=$(grep -n "Area 1:" $OUT_SIM_FILE)                                                   # get the line number of "Area 1:"
-    inst_offset=$(echo $inst_area | awk -F "offset: " '{print $2}' | awk -F ", base" '{print $1}') # get the offset of "Area 1:"
-    inst_offset_decimal=$(printf "%d" $inst_offset)                                                # convert hex to decimal
-    inst_base=$(echo $inst_area | awk -F "base: " '{print $2}' | awk -F ", size" '{print $1}')     # get the base of "Area 1:"
-    inst_size=$(echo $inst_area | awk -F "size: " '{print $2}' | awk -F ", nbBlocks" '{print $1}') # get the size of "Area 1:"
-    inst_size_decimal=$(printf "%d" $inst_size)                                                    # convert hex to decimal
-    inst_size_bits=$(($inst_size_decimal * 8))                                                     # convert decimal to bits
-    echo "inst_offset: $inst_offset, inst_base: $inst_base, inst_size: $inst_size_decimal"
-
-    # flash bitstream hex file
-    echo "search for $OUT_FLASH_FILE"
-    # offset 1: search from offset decimal line to the size decimal，and joint together
-    data0=$(sed -n "$((data_offset_decimal + 1)),$((data_offset_decimal + data_size_decimal))p" $OUT_FLASH_FILE | tr -d '\n')
-    # at the top add "0x"
-    data0="0x$data0"
-    # data0 at raw data such as "0x00000000", need to remove space 、@、or other characters
-    data0=$(echo $data0 | tr -d '[:space:]')
-    echo "data0: $data0"
-
-    # offset 2: search from offset decimal line to the size decimal，and joint together
-    data1=$(sed -n "$((inst_offset_decimal + 1)),$((inst_offset_decimal + inst_size_decimal))p" $OUT_FLASH_FILE | tr -d '\n')
-    # at the top add "0x"
-    data1="0x$data1"
-    # data1 at raw data such as "0x00000000", need to remove space 、@、or other characters
-    data1=$(echo $data1 | tr -d '[:space:]')
-    echo "data1: $data1"
-
-    # jtag write
-    ./write_jtag $data_base $data_size_bits $data0
-    ./write_jtag $inst_base $inst_size_bits $data1
-
+    python $PROJECT_DIR/jtag.py $OUT_SIM_FILE $OUT_FLASH_FILE
     exit 0
 fi
 
