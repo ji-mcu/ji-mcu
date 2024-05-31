@@ -93,7 +93,10 @@ data0 = re.sub(r"\s+", "", data0)
 print("data0: %s" % data0)
 # because the jtag is fifo to write, so need to write the data0 reverse
 data0 = re.sub(r"0x", "", data0)
-data0 = data0[::-2] + data0[-2:]
+# such as origin is "0x0102", change to "0x0201", data[::-1] is "2010"
+data0 = data0[::-1] # reverse every two hex
+for i in range(0, len(data0), 2):
+    data0 = data0[:i] + data0[i+1] + data0[i] + data0[i+2:]
 data0 = "0x" + data0
 
 data1 = all.split("\n")[inst_offset_decimal -1 : inst_offset_decimal + inst_size_decimal]
@@ -101,9 +104,11 @@ data1 = "".join(data1)
 data1 = "0x" + data1
 data1 = re.sub(r"\s+", "", data1)
 print("data1: %s" % data1)
-# because the jtag is fifo to write, so need to write the data1 reverse, with 2 hex
+# because the jtag is fifo to write, so need to write the data1 reverse
 data1 = re.sub(r"0x", "", data1)
-data1 = data1[::-2] + data1[-2:]
+data1 = data1[::-1] # reverse every two hex
+for i in range(0, len(data1), 2):
+    data1 = data1[:i] + data1[i+1] + data1[i] + data1[i+2:]
 data1 = "0x" + data1
 
 # jtag write
