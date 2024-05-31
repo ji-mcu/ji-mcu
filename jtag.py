@@ -72,14 +72,27 @@ inst_size_decimal = int(inst_size.group(1), 16)
 inst_size_bits = inst_size_decimal * 8
 print("inst_offset: %d, inst_base: %s, inst_size: %dB" % (inst_offset_decimal, inst_base.group(1), inst_size_decimal))
 
+# find area in <OUT_FLASH_FILE>, because the system difference, need read the two hex at the front of \n
+# system1:
+# such @00000000 00
+#      @00000002 00
+# system2:
+# or 00
+#    01
+
+# you need ignore @00000000, such as del @[0-9a-fA-F]
+all = re.sub(r"@([0-9a-fA-F]+)", "", out_flash)
+# del only space
+all = re.sub(r" ", "", all)
+
 # find area in <OUT_FLASH_FILE>
-data0 = out_flash.split("\n")[data_offset_decimal -1 : data_offset_decimal + data_size_decimal]
+data0 = all.split("\n")[data_offset_decimal -1 : data_offset_decimal + data_size_decimal]
 data0 = "".join(data0)
 data0 = "0x" + data0
 data0 = re.sub(r"\s+", "", data0)
 print("data0: %s" % data0)
 
-data1 = out_flash.split("\n")[inst_offset_decimal -1 : inst_offset_decimal + inst_size_decimal]
+data1 = all.split("\n")[inst_offset_decimal -1 : inst_offset_decimal + inst_size_decimal]
 data1 = "".join(data1)
 data1 = "0x" + data1
 data1 = re.sub(r"\s+", "", data1)
