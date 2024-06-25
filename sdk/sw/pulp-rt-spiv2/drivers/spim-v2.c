@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-
-/* 
+/*
  * Authors: Germain Haugou, ETH (germain.haugou@iis.ee.ethz.ch)
  *          Jie Chen, GreenWaves Technologies (jie.chen@greenwaves-technologies.com)
  */
@@ -25,13 +24,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
-
 #define DEBUG 0
-
 
 #ifdef DEBUG
 static int gStep = 0;
-
 
 // void wait_soc_event()
 // {
@@ -44,9 +40,8 @@ static int gStep = 0;
 //   hal_itc_enable_clr(1 << ARCHI_FC_EVT_SOC_EVT);
 // }
 
-
-
-static void uart_sendchar( const char c) {
+static void uart_sendchar(const char c)
+{
   // setup next transfer
   // data->udma_uart_tx_buffer[0] = c;
   char udma_uart_tx_buffer[1];
@@ -55,42 +50,37 @@ static void uart_sendchar( const char c) {
   // wait_soc_event(ARCHI_SOC_EVENT_UART_TX(0));
 }
 
-static void putch(char c) {
+static void putch(char c)
+{
   uart_sendchar(c);
 }
 
-static inline void step_ok() {
-  putch('A' + gStep);  
+static inline void step_ok()
+{
+  putch('A' + gStep);
   gStep++;
-  putch( '\n');  
+  putch('\n');
 }
 
-static inline void step_ko() {
-  putch( '!');  
-  putch( '\n');  
+static inline void step_ko()
+{
+  putch('!');
+  putch('\n');
 }
 
-static inline void step_done() {
-  putch( '.');  
-  putch( '\n');  
+static inline void step_done()
+{
+  putch('.');
+  putch('\n');
 }
 
 #endif
 
-
-
-
-
-
-
-
-
-
-
 static int __rt_spim_open_count[ARCHI_UDMA_NB_SPIM];
 
-typedef struct {
-    unsigned int cmd[4];
+typedef struct
+{
+  unsigned int cmd[4];
 } rt_spim_cmd_t;
 
 static inline int __rt_spim_id(int periph_id)
@@ -103,8 +93,6 @@ static inline unsigned int __rt_freq_periph_get()
   return 50000000;
 }
 
-
-
 static int __rt_spi_get_div(int spi_freq)
 {
   int periph_freq = __rt_freq_periph_get();
@@ -116,11 +104,12 @@ static int __rt_spi_get_div(int spi_freq)
   else
   {
     // Round-up the divider to obtain an SPI frequency which is below the maximum
-    int div = (__rt_freq_periph_get() + spi_freq - 1)/ spi_freq;
+    int div = (__rt_freq_periph_get() + spi_freq - 1) / spi_freq;
 
     // The SPIM always divide by 2 once we activate the divider, thus increase by 1
     // in case it is even to not go avove the max frequency.
-    if (div & 1) div += 1;
+    if (div & 1)
+      div += 1;
     div >>= 1;
 
     return div;
@@ -134,15 +123,13 @@ static inline int __rt_spim_get_byte_align(int wordsize, int big_endian)
 
 void rt_spim_open(char *dev_name, rt_spim_conf_t *conf, rt_spim_t *spim)
 {
-//   #ifdef DEBUG
-//   step_ok();
-// #endif
+  //   #ifdef DEBUG
+  //   step_ok();
+  // #endif
 
   // int irq = hal_irq_disable();
-  
 
   // __rt_padframe_init();
-
 
   rt_spim_conf_t def_conf;
 
@@ -155,26 +142,27 @@ void rt_spim_open(char *dev_name, rt_spim_conf_t *conf, rt_spim_t *spim)
   int channel = -1;
 
   if (conf->id != -1)
-  {  
+  {
     // rt_trace(RT_TRACE_DEV_CTRL, "[SPIM] Opening spim device (id: %d)\n", conf->id);
     channel = ARCHI_UDMA_SPIM_ID(conf->id);
   }
   else if (dev_name != NULL)
   {
     // rt_trace(RT_TRACE_DEV_CTRL, "[SPIM] Opening spim device (name: %s)\n", dev_name);
-  
+
     // rt_dev_t *dev = rt_dev_get(dev_name);
     // if (dev == NULL) goto error;
 
     // channel = dev->channel;
   }
 
-  if (channel == -1)  return;
+  if (channel == -1)
+    return;
 
   // rt_spim_t *spim = rt_alloc(RT_ALLOC_FC_DATA, sizeof(rt_spim_t));
   // if (spim == NULL) goto error;
 
-  spim->channel = channel*2;
+  spim->channel = channel * 2;
 
   // __rt_periph_channel(spim->channel+1)->callback = __rt_spim_handle_tx_end;
 
@@ -185,7 +173,6 @@ void rt_spim_open(char *dev_name, rt_spim_conf_t *conf, rt_spim_t *spim)
   spim->max_baudrate = conf->max_baudrate;
   spim->cs = conf->cs;
   spim->byte_align = __rt_spim_get_byte_align(conf->wordsize, conf->big_endian);
-
 
   int div = __rt_spi_get_div(spim->max_baudrate);
   spim->div = div;
@@ -198,22 +185,22 @@ void rt_spim_open(char *dev_name, rt_spim_conf_t *conf, rt_spim_t *spim)
 
   if (__rt_spim_open_count[id] == 1)
   {
-    plp_udma_cg_set(plp_udma_cg_get() | (1<<channel));
+    plp_udma_cg_set(plp_udma_cg_get() | (1 << channel));
   }
 
   channel++;
   // printf("Hello!\n");
 
-//   #ifdef DEBUG
-//   step_ok();
-// #endif
+  //   #ifdef DEBUG
+  //   step_ok();
+  // #endif
   // printf("Hello end!\n");
 
   // hal_irq_restore(irq);
   return;
 
-// error:
-//   rt_warning("[SPIM] Failed to open spim device\n");
+  // error:
+  //   rt_warning("[SPIM] Failed to open spim device\n");
   // return;
 }
 
@@ -233,11 +220,14 @@ void __rt_spim_control(rt_spim_t *handle, rt_spim_control_e cmd, uint32_t arg)
     handle->div = __rt_spi_get_div(arg);
   }
 
-  if (polarity) handle->polarity = polarity >> 1;
-  if (phase) handle->phase = phase >> 1;
-  if (wordsize) handle->wordsize = wordsize >> 1;
-  if (big_endian) handle->big_endian = big_endian >> 1;
-
+  if (polarity)
+    handle->polarity = polarity >> 1;
+  if (phase)
+    handle->phase = phase >> 1;
+  if (wordsize)
+    handle->wordsize = wordsize >> 1;
+  if (big_endian)
+    handle->big_endian = big_endian >> 1;
 
   handle->cfg = SPI_CMD_CFG(handle->div, handle->polarity, handle->phase);
   handle->byte_align = __rt_spim_get_byte_align(handle->wordsize, handle->big_endian);
@@ -256,7 +246,7 @@ void rt_spim_close(rt_spim_t *handle)
 
   if (__rt_spim_open_count[id] == 0)
   {
-    plp_udma_cg_set(plp_udma_cg_get() & ~(1<<(handle->channel>>1)));
+    plp_udma_cg_set(plp_udma_cg_get() & ~(1 << (handle->channel >> 1)));
 
     soc_eu_fcEventMask_clearEvent(handle->channel);
     soc_eu_fcEventMask_clearEvent(handle->channel + 1);
@@ -289,10 +279,9 @@ void rt_spim_close(rt_spim_t *handle)
 void __rt_spim_send_async(rt_spim_t *handle, void *data, int len, int qspi, rt_spim_cs_e cs_mode)
 {
   // rt_trace(RT_TRACE_SPIM, "[SPIM] Send bitstream (handle: %p, buffer: %p, len: 0x%x, qspi: %d, keep_cs: %d, event: %p)\n", handle, data, len, qspi, cs_mode, event);
-// #ifdef DEBUG
-//   step_ok();
-// #endif
-
+  // #ifdef DEBUG
+  //   step_ok();
+  // #endif
 
   // int irq = hal_irq_disable();
 
@@ -308,11 +297,10 @@ void __rt_spim_send_async(rt_spim_t *handle, void *data, int len, int qspi, rt_s
 
   cmd.cmd[0] = handle->cfg;
   cmd.cmd[1] = SPI_CMD_SOT(handle->cs);
-  cmd.cmd[2] = SPI_CMD_TX_DATA(len, qspi, handle->byte_align);
+  cmd.cmd[2] = SPI_CMD_TX_DATA(len, 0, qspi, handle->byte_align);
 
   // modify by nszjh, 2020-6-19  use v3
-  // cmd.cmd[2] = SPI_CMD_TX_DATA(len/32, SPI_CMD_1_WORD_PER_TRANSF, 32, qspi, SPI_CMD_MSB_FIRST);
-
+  // cmd.cmd[2] = SPI_CMD_TX_DATA(len / 32, SPI_CMD_1_WORD_PER_TRANSF, 32, qspi, SPI_CMD_MSB_FIRST);
 
   // copy->event = event;
 
@@ -320,7 +308,7 @@ void __rt_spim_send_async(rt_spim_t *handle, void *data, int len, int qspi, rt_s
 
   // rt_periph_channel_t *channel = __rt_periph_channel(channel_id);
   int size = (len + 7) >> 3;
-  unsigned int base = hal_udma_channel_base(channel_id+1);
+  unsigned int base = hal_udma_channel_base(channel_id + 1);
 
   // printf("base = %x\n",base);
 
@@ -328,26 +316,27 @@ void __rt_spim_send_async(rt_spim_t *handle, void *data, int len, int qspi, rt_s
   {
     if (cs_mode != RT_SPIM_CS_AUTO)
     {
-      soc_eu_fcEventMask_setEvent(channel_id+1);
+      soc_eu_fcEventMask_setEvent(channel_id + 1);
       printf("H !\n");
     }
 
-    plp_udma_enqueue(base, (unsigned int)&cmd, 3*4, UDMA_CHANNEL_CFG_EN);
+    plp_udma_enqueue(base, (unsigned int)&cmd, 3 * 4, UDMA_CHANNEL_CFG_EN);
     plp_udma_enqueue(base, (unsigned int)data, size, UDMA_CHANNEL_CFG_EN);
 
     if (cs_mode == RT_SPIM_CS_AUTO)
     {
-      while(!plp_udma_canEnqueue(base));
+      while (!plp_udma_canEnqueue(base))
+        ;
 
       cmd.cmd[0] = SPI_CMD_EOT(1);
-      plp_udma_enqueue(base, (unsigned int)&cmd, 1*4, UDMA_CHANNEL_CFG_EN);
+      plp_udma_enqueue(base, (unsigned int)&cmd, 1 * 4, UDMA_CHANNEL_CFG_EN);
       printf("G !\n");
     }
   }
 
-// #ifdef DEBUG
-//   step_ok();
-// #endif
+  // #ifdef DEBUG
+  //   step_ok();
+  // #endif
 
   // else
   // {
@@ -388,10 +377,10 @@ void __rt_spim_receive_async(rt_spim_t *handle, void *data, int len, int qspi, r
   // rt_spim_cmd_t *cmd = (rt_spim_cmd_t *)copy->periph_data;
   rt_spim_cmd_t cmd;
 
-  int cmd_size = 3*4;
+  int cmd_size = 3 * 4;
   cmd.cmd[0] = handle->cfg;
   cmd.cmd[1] = SPI_CMD_SOT(handle->cs);
-  cmd.cmd[2] = SPI_CMD_RX_DATA(len, qspi, handle->byte_align);
+  cmd.cmd[2] = SPI_CMD_RX_DATA(len, 0, qspi, handle->byte_align);
   if (cs_mode == RT_SPIM_CS_AUTO)
   {
     cmd.cmd[3] = SPI_CMD_EOT(1);
@@ -407,15 +396,16 @@ void __rt_spim_receive_async(rt_spim_t *handle, void *data, int len, int qspi, r
   // if (__rt_spim_enqueue_to_channel(channel, copy))
   {
     unsigned int tx_base = hal_udma_channel_base(channel_id + 1);
-    plp_udma_enqueue(tx_base, (unsigned int)&cmd, 3*4, UDMA_CHANNEL_CFG_EN);
-    plp_udma_enqueue(rx_base, (unsigned int)data, size, UDMA_CHANNEL_CFG_EN | (2<<1));
+    plp_udma_enqueue(tx_base, (unsigned int)&cmd, 3 * 4, UDMA_CHANNEL_CFG_EN);
+    plp_udma_enqueue(rx_base, (unsigned int)data, size, UDMA_CHANNEL_CFG_EN | (2 << 1));
 
-   if (cs_mode == RT_SPIM_CS_AUTO)
+    if (cs_mode == RT_SPIM_CS_AUTO)
     {
-      while(!plp_udma_canEnqueue(tx_base));
+      while (!plp_udma_canEnqueue(tx_base))
+        ;
 
       cmd.cmd[0] = SPI_CMD_EOT(1);
-      plp_udma_enqueue(tx_base, (unsigned int)&cmd, 1*4, UDMA_CHANNEL_CFG_EN);
+      plp_udma_enqueue(tx_base, (unsigned int)&cmd, 1 * 4, UDMA_CHANNEL_CFG_EN);
     }
   }
   // else
@@ -469,25 +459,26 @@ void rt_spim_transfer_async(rt_spim_t *handle, void *tx_data, void *rx_data, int
   // rt_periph_channel_t *channel = __rt_periph_channel(channel_id);
   int size = (len + 7) >> 3;
   unsigned int rx_base = hal_udma_channel_base(channel_id);
-  unsigned int tx_base = hal_udma_channel_base(channel_id+1);
+  unsigned int tx_base = hal_udma_channel_base(channel_id + 1);
 
   // if (__rt_spim_enqueue_to_channel(channel, copy))
   {
     if (cs_mode != RT_SPIM_CS_AUTO)
     {
-      soc_eu_fcEventMask_setEvent(channel_id+1);
+      soc_eu_fcEventMask_setEvent(channel_id + 1);
     }
 
-    plp_udma_enqueue(tx_base, (unsigned int)&cmd, 3*4, UDMA_CHANNEL_CFG_EN);
-    plp_udma_enqueue(rx_base, (unsigned int)rx_data, size, UDMA_CHANNEL_CFG_EN | (2<<1));
+    plp_udma_enqueue(tx_base, (unsigned int)&cmd, 3 * 4, UDMA_CHANNEL_CFG_EN);
+    plp_udma_enqueue(rx_base, (unsigned int)rx_data, size, UDMA_CHANNEL_CFG_EN | (2 << 1));
     plp_udma_enqueue(tx_base, (unsigned int)tx_data, size, UDMA_CHANNEL_CFG_EN);
 
     if (cs_mode == RT_SPIM_CS_AUTO)
     {
-      while(!plp_udma_canEnqueue(tx_base));
+      while (!plp_udma_canEnqueue(tx_base))
+        ;
 
       cmd.cmd[0] = SPI_CMD_EOT(1);
-      plp_udma_enqueue(tx_base, (unsigned int)&cmd, 1*4, UDMA_CHANNEL_CFG_EN);
+      plp_udma_enqueue(tx_base, (unsigned int)&cmd, 1 * 4, UDMA_CHANNEL_CFG_EN);
     }
   }
   // else

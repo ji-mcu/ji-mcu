@@ -38,6 +38,9 @@ PULP_SRCS     += kernel/fll-v$(fll/version).c
 PULP_SRCS     += kernel/freq-domains.c
 PULP_SRCS     += kernel/chips/pulpissimo/soc.c
 
+# spim
+PULP_SRCS += drivers/spim-v2.c
+
 
 include $(PULPRT_HOME)/rules/pulpos/configs/default.mk
 
