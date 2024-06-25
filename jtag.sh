@@ -6,41 +6,19 @@ OUT_SIM_FILE=$PROJECT_DIR/sdk/sw/runner/out.txt
 OUT_FLASH_FILE=$PROJECT_DIR/sdk/sw/runner/flash_stim.slm
 
 # set env
+cd $PROJECT_DIR
+source ./env.sh
 cd $PULP_BRIDGE_DIR
 source ./set_env.sh
 
-# run 'write_jtag' with different address/size/value, like: './write_jtag 0x1c000010 32 0x15263738'"
+ACHITECUTRE=riscv:rv32
+PORT=1234
+ELF_PATH=$PROJECT_DIR/sdk/sw/apps/$2/build/$2
 
-# make run show: " Area 0: offset: 0x800, base: 0x1c000004, size: 0x44, nbBlocks: 1 "
-#                " Area 1: offset: 0x1000, base: 0x1c020000, size: 0x2ac, nbBlocks: 1 "
-
-# in OUT_SIM_FILE show " Generating boot binary "
-#                      " Nb areas: 2 "
-#                      " flashOffset: 2048 "
-#                      " Area 0: offset: 0x800, base: 0x1c000004, size: 0x44, nbBlocks: 1 "
-#                      " Area 1: offset: 0x1000, base: 0x1c020000, size: 0x2ac, nbBlocks: 1 "
-#                      " flashOffset: 6144 "
-#                      " crc_offset: 144, flashOffset: 0, header_buff len: 48 "
-#                      " header_buff: 144 "
-#                      " Generating files (header offset: 0x1800) "
-
-# OUT_FLASH_FILE show:
-# 00
-# 18
-# 00
-# 00
-# 02
-# 00
-# 00
-# 00
-# 80
-# 00
-# 02
-# ...
-
-if [ $# == 1 ] && [ $1 == "-f" ]; then # if input "./jtag.sh -f" then flash the bitstream
-    python $PROJECT_DIR/jtag.py $OUT_SIM_FILE $OUT_FLASH_FILE
-    exit 0
+if [ $# == 2 ] && [ $1 == "-f" ]; then # if input "./jtag.sh -f" then flash the bitstream with gdb
+    cd $PROJECT_DIR
+    bash -c " source ./env.sh; riscv32-unknown-elf-gdb --eval-command='set architecture $ACHITECUTRE' --eval-command='target remote localhost:$PORT' --eval-command='file $ELF_PATH' --eval-command='load';exec bash"
+    bash -c " plpbridge --chip=pulpissimo --cable=ftdi@digilent gdb wait --rsp-port=$PORT"
 fi
 
 # if input "./jtag.sh -r" then show the regs
@@ -57,11 +35,20 @@ if [ $# == 1 ] && [ $1 == "-r" ]; then
     exit 0
 fi
 
+# if input "./jtag.sh -r xxx" then show the address
+if [ $# == 2 ] && [ $1 == "-r" ]; then
+    echo "JTAG REGS: "
+    echo "$2 addr in 0x1A10xxxx: "
+    ./read_jtag $2 32
+
+    exit 0
+fi
+
 # if input "./jtag.sh -h" or "./jtag.sh --help" then show help
 if [ $# == 1 ] && ([ $1 == "-h" ] || [ $1 == "--help" ]); then
     echo "Usage: ./jtag.sh [OPTION]"
     echo "  -f, --flash    flash the bitstream"
-    echo "  -r, --regs     show the regs"
+    echo "  -r <xxx>, --regs     show the regs or address"
     echo "  -h, --help     display this help and exit"
     exit 0
 fi
