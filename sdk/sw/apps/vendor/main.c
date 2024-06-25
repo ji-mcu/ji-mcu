@@ -17,5 +17,6 @@
 
 int main()
 {
+  spi_test_send();
   return 0;
 }
