@@ -44,6 +44,20 @@ if [ $# == 2 ] && [ $1 == "-r" ]; then
     exit 0
 fi
 
+# if input "./jtag.sh -c"
+if [ $# == 1 ] && [ $1 == "-c" ]; then
+    echo "write start area "
+    ./write_jtag 0x1a101004 4 0x1c020000
+    ./read_jtag 0x1a101004 4
+    ./write_jtag 0x1a1010cc 4 3
+
+    ./write_jtag 0x1a101008 4 0
+    ./write_jtag 0x1a101008 4 1
+    ./write_jtag 0x1a1010cc 4 0
+
+    exit 0
+fi
+
 # if input "./jtag.sh -h" or "./jtag.sh --help" then show help
 if [ $# == 1 ] && ([ $1 == "-h" ] || [ $1 == "--help" ]); then
     echo "Usage: ./jtag.sh [OPTION]"
