@@ -12,21 +12,30 @@
 
 - 这个会配置环境变量
 
-3. 进入到`sdk/sw/app/<你的项目目录>`里：
-   其中 makefile 配置中，大概是这样的：
+3. 进入到`sdk/sw/app/<你的项目目录>`里（我已经配置了过了，如果没有特殊要求的话，这个可以忽略），其中 makefile 配置中，大概是这样的：
 
    ```
    PULP_APP = test
    PULP_APP_SRCS = test.c
    # PULP_CFLAGS = -c
 
-   PULP_CFLAGS = -O3 -g
+   PULP_APP_CFLAGS = -O3 -g
 
    # Configuration
 
    RISCV_RCP_PATH = <你的 pulp-rt-spiv2 目录的绝对路径>
    include $(RISCV_RCP_SDK_PATH)/rules/pulp.mk
    ```
+
+5. 运行`make clean`先删除中间文件（不运行也行）
+
+6. 然后再运行`make run`：
+
+- 这个会删除`flash.bin`，并且顺便使用 gdb 烧录你生成的 elf 文件，进入 gdb 后直接 y ，然后 quit 就行了，下面指令后，它会自动重启，所以直接 quit 就行
+
+7. 然后再使用`./jtag.sh -c`：
+
+- 这个指令会自动用 jtag 配置你的板子，比如配置启动地址等
 
 ## build
 
@@ -65,3 +74,7 @@
   - 或者添加模块路径：
 
     - 参考：https://blog.csdn.net/qq_41833285/article/details/100077827
+
+- ④ ftdi 问题：
+
+  - gdb 烧录完后，可能会断，这是重新连就行
