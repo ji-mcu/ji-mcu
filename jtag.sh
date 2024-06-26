@@ -47,7 +47,7 @@ fi
 # if input "./jtag.sh -c"
 if [ $# == 1 ] && [ $1 == "-c" ]; then
     echo "write start area "
-    ./write_jtag 0x1a101004 4 0x1c040000
+    ./write_jtag 0x1a101004 4 0x1c020000
     ./read_jtag 0x1a101004 4
     ./write_jtag 0x1a1010cc 4 3
 
