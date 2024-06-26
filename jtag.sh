@@ -13,7 +13,7 @@ source ./set_env.sh
 
 ACHITECUTRE=riscv:rv32
 PORT=1234
-ELF_PATH=$PROJECT_DIR/sdk/sw/apps/$2/build/$2
+ELF_PATH=$PROJECT_DIR/sdk/sw/apps/$2/build/$2/$2
 
 if [ $# == 2 ] && [ $1 == "-f" ]; then # if input "./jtag.sh -f" then flash the bitstream with gdb
     cd $PROJECT_DIR
