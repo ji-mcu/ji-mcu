@@ -17,8 +17,8 @@ ELF_PATH=$PROJECT_DIR/sdk/sw/apps/$2/build/$2/$2
 
 if [ $# == 2 ] && [ $1 == "-f" ]; then # if input "./jtag.sh -f" then flash the bitstream with gdb
     cd $PROJECT_DIR
+    plpbridge --chip=pulpissimo --cable=ftdi@digilent gdb wait --rsp-port=$PORT &
     bash -c " source ./env.sh; riscv32-unknown-elf-gdb --eval-command='set architecture $ACHITECUTRE' --eval-command='target remote localhost:$PORT' --eval-command='file $ELF_PATH' --eval-command='load';exec bash"
-    bash -c " plpbridge --chip=pulpissimo --cable=ftdi@digilent gdb wait --rsp-port=$PORT"
 fi
 
 # if input "./jtag.sh -r" then show the regs
@@ -47,7 +47,7 @@ fi
 # if input "./jtag.sh -c"
 if [ $# == 1 ] && [ $1 == "-c" ]; then
     echo "write start area "
-    ./write_jtag 0x1a101004 4 0x1c020000
+    ./write_jtag 0x1a101004 4 0x1c040000
     ./read_jtag 0x1a101004 4
     ./write_jtag 0x1a1010cc 4 3
 
