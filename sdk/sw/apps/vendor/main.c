@@ -22,7 +22,7 @@ int main()
   rt_spim_conf_init(&conf);
   // Set maximum baudrate. Can actually be lower than
   // that depending on the best divider found
-  conf.max_baudrate = 1000000;
+  conf.max_baudrate = 12000000;
   // SPI interface identifier as the Pulp chip can have
   // several interfaces
   conf.id = 0;
