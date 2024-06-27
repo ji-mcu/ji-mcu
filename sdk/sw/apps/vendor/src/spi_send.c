@@ -90,7 +90,7 @@ void erase_delay()
     cmd[0] = SPI_CMD_CFG(1, 0, 0);
     cmd[1] = SPI_CMD_SOT(0);
     cmd[2] = SPI_CMD_SEND_CMD(0x05, 8, 0);
-    cmd[3] = SPI_CMD_RX_DATA(8, 0, 0, SPI_CMD_BYTE_ALIGN_ENA);
+    cmd[3] = SPI_CMD_RX_DATA(8, 0, SPI_CMD_BYTE_ALIGN_ENA);
     cmd[4] = SPI_CMD_EOT(1);
 
     plp_udma_enqueue(UDMA_SPIM_TX_ADDR(0), cmd, 5 * 4, UDMA_CHANNEL_CFG_EN | UDMA_CHANNEL_CFG_SIZE_32);
@@ -105,7 +105,10 @@ int spi_test_send()
   int spi_wr_data;
   int spi_rd_data;
 
-  printf("SPI TRANSFER TESTING!\n");
+  for (int i = 0; i < DATA_SIZE / 4; i++)
+  {
+    pulp_write32((ARCHI_SPITX_BUF0_ADDR + i * 4), i);
+  }
 
   for (int i = 0; i < DATA_SIZE / 4; i++)
   {
@@ -156,13 +159,12 @@ int spi_test_send()
   pulp_write32(0x1A101010, 1 << 16 | 1 << 18 | 1 << 20 | 1 << 22);
   pulp_write32(0x1A101014, 0x0);
 
-  printf("SPI STD WRITE TESTING!\n");
   cmd[0] = SPI_CMD_CFG(1, 0, 0);
   cmd[1] = SPI_CMD_SOT(0);
   // cmd[2] = SPI_CMD_SEND_CMD       (0x02, 8, 0); //page program
   // cmd[2] = SPI_CMD_SEND_ADDR      (24, 0);
   // cmd[3] = SPI_CMD_SEND_ADDR_VALUE(0x0<<8);
-  cmd[2] = SPI_CMD_TX_DATA(DATA_SIZE * 8, 0, 0, 0);
+  cmd[2] = SPI_CMD_TX_DATA(DATA_SIZE * 8, 0, SPI_CMD_BYTE_ALIGN_ENA);
   // cmd[2] = SPI_CMD_RX_DATA        (DATA_SIZE*8, 0, 0, 0);
   // SPI1
   plp_udma_enqueue(0x1A104280 + 0x10, cmd, 3 * 4, UDMA_CHANNEL_CFG_EN | UDMA_CHANNEL_CFG_SIZE_32);
@@ -175,7 +177,7 @@ int spi_test_send()
   cmd[0] = SPI_CMD_EOT(1);
   plp_udma_enqueue(0x1A104300 + 0x10, cmd, 1 * 4, UDMA_CHANNEL_CFG_EN | UDMA_CHANNEL_CFG_SIZE_32);
   // wait_soc_event();
-  printf("TEST TX End!\n");
+
   // erase_delay();
 
   return 0;

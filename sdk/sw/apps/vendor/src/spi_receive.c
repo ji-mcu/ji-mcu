@@ -33,7 +33,7 @@ void write_status(int cmd_data, int data)
   cmd[0] = 0x1;
   cmd[1] = SPI_CMD_SOT(0);
   cmd[2] = SPI_CMD_SEND_CMD(cmd_data, 8, 0);
-  cmd[3] = SPI_CMD_TX_DATA(16, 0, 0, 0);
+  cmd[3] = SPI_CMD_TX_DATA(16, 0, SPI_CMD_BYTE_ALIGN_ENA);
 
   data_buffer[0] = data;
 
@@ -68,7 +68,7 @@ int spi_test_receive()
   cmd[2] = SPI_CMD_SEND_CMD(0x6b, 8, 0);
   cmd[3] = SPI_CMD_SEND_ADDR(32, 0);
   cmd[4] = SPI_CMD_SEND_ADDR_VALUE(0);
-  cmd[5] = SPI_CMD_RX_DATA(DATA_SIZE * 32, 0, 1, SPI_CMD_BYTE_ALIGN_ENA);
+  cmd[5] = SPI_CMD_RX_DATA(DATA_SIZE * 32, 1, SPI_CMD_BYTE_ALIGN_ENA);
   cmd[6] = SPI_CMD_EOT(1);
 
   plp_udma_enqueue(UDMA_SPIM_TX_ADDR(0), cmd, CMD_SIZE * 4, UDMA_CHANNEL_CFG_EN | UDMA_CHANNEL_CFG_SIZE_32);

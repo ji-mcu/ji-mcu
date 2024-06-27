@@ -297,7 +297,7 @@ void __rt_spim_send_async(rt_spim_t *handle, void *data, int len, int qspi, rt_s
 
   cmd.cmd[0] = handle->cfg;
   cmd.cmd[1] = SPI_CMD_SOT(handle->cs);
-  cmd.cmd[2] = SPI_CMD_TX_DATA(len, 0, qspi, handle->byte_align);
+  cmd.cmd[2] = SPI_CMD_TX_DATA(len, qspi, handle->byte_align);
 
   // modify by nszjh, 2020-6-19  use v3
   // cmd.cmd[2] = SPI_CMD_TX_DATA(len / 32, SPI_CMD_1_WORD_PER_TRANSF, 32, qspi, SPI_CMD_MSB_FIRST);
@@ -380,7 +380,7 @@ void __rt_spim_receive_async(rt_spim_t *handle, void *data, int len, int qspi, r
   int cmd_size = 3 * 4;
   cmd.cmd[0] = handle->cfg;
   cmd.cmd[1] = SPI_CMD_SOT(handle->cs);
-  cmd.cmd[2] = SPI_CMD_RX_DATA(len, 0, qspi, handle->byte_align);
+  cmd.cmd[2] = SPI_CMD_RX_DATA(len, qspi, handle->byte_align);
   if (cs_mode == RT_SPIM_CS_AUTO)
   {
     cmd.cmd[3] = SPI_CMD_EOT(1);
