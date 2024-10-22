@@ -27,9 +27,9 @@
    include $(RISCV_RCP_SDK_PATH)/rules/pulp.mk
    ```
 
-5. 运行`make clean`先删除中间文件（不运行也行）
+4. 运行`make clean`先删除中间文件（不运行也行）
 
-6. 然后再运行`make run`：
+5. 然后再运行`make run`：
 
 - 这个会删除`flash.bin`，并且顺便使用 gdb 烧录你生成的 elf 文件，进入 gdb 后直接 y ，然后 quit 就行了，下面指令后，它会自动重启，所以直接 quit 就行
 
@@ -78,3 +78,7 @@
 - ④ ftdi 问题：
 
   - gdb 烧录完后，可能会断，这是重新连就行
+
+- ⑤ lfs 文件问题：
+
+  - lfs 文件可能下载不了，那就从 temp 下载，放到`sdk/toolchain/libexec/gcc/riscv32-unknown-elf/7.1.1/`
