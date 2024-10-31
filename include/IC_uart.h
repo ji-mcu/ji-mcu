@@ -43,6 +43,8 @@ typedef enum
     UART_7BYTE_TRIG,     // 7字节
 } UARTByteTypeDef;
 
+
+
 /**
  * @brief Config Uart stop bit num
  */
@@ -51,6 +53,22 @@ typedef enum uart_stop_bit
     UART_STOP_BIT_1 = 0,
     UART_STOP_BIT_2 = 1
 } UART_STOP_BIT; // 停止位
+
+/* Uart Init structure definition  */
+typedef struct
+{
+    uint32_t uart_ClockSpeed; /* Specifies the clock frequency.
+                                This parameter must be set to a value lower than 400kHz */
+
+    uint16_t Uart_Mode;        /* Specifies the I2C mode.
+                                 This parameter can be a value of @ref I2C_mode */
+    uint16_t Uart_count ;       //  This parameter can be a 7-bit or 10-bit address. */
+
+    uint32_t Uart_rx_addr; /* destination address */
+
+    uint32_t Uart_tx_addr;     /* destination address */
+
+} Uart_InitTypeDef;
 
 
 /**

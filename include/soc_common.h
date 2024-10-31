@@ -60,6 +60,7 @@ extern "C"
 
 #include <string.h>
 #include <stdint.h>
+#include <stdio.h>
 #include "hal/pulp_io.h"
 #include "core_riscv.h"
 #include "core_SFR.h"
@@ -70,6 +71,8 @@ extern "C"
 #include "IC_i2c.h"
 #include "IC_uart.h"
 #include "IC_RCC.h"
+#include "IC_timer.h"
+#include "soc_printf.h"
 
 #define DelayMs(x) mDelaymS(x)
 #define DelayUs(x) mDelayuS(x)
@@ -78,11 +81,7 @@ extern "C"
 #define SOC_Fetchen     0x1a101008
 #define SOC_boot_addr   0x1a101004
 
-
-
-
-
-
+#define SET_BIT(REG, BIT) ((REG) |= (BIT))
 
 #ifdef __cplusplus
 }

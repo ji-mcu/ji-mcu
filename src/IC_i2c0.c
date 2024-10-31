@@ -84,17 +84,19 @@ void I2C_Init(RV_i2c_t *I2Cx, I2C_InitTypeDef *I2C_InitStruct , I2C_Ptr *I2C_px)
     freqrange = (uint16_t)(pclk1 / I2C_InitStruct->I2C_ClockSpeed); // Fsys/2/Baudrate
     // select baudrate as 100KHz
     tmpreg = freqrange >> 8;
-    I2C_px->i2c_data_reg[2] = tmpreg;
+    // I2C_px->i2c_data_reg[2] = tmpreg;
+    I2C_px->i2c_data_reg[2] = 0x02;
     tmpreg = freqrange ;
-    I2C_px->i2c_data_reg[3] = tmpreg;
-    I2C_px->i2c_data_reg[4] = I2C_CMD_RPT;
+    // I2C_px->i2c_data_reg[3] = tmpreg;
+    I2C_px->i2c_data_reg[3] = 0x00;
+    // I2C_px->i2c_data_reg[4] = I2C_CMD_RPT;
     // I2C_TX_Ptr =
-    tmpreg = I2Cx->i2c_status;
+    // tmpreg = I2Cx->i2c_status;
 
-    while (tmpreg!=0)
-    {
-        tmpreg = I2Cx->i2c_status;
-    }
+    // while (tmpreg!=0)
+    // {
+    //     tmpreg = I2Cx->i2c_status;
+    // }
     
     tmpreg = 0;
 
@@ -284,7 +286,7 @@ void I2C_ITConfig(RV_i2c_t *I2Cx, uint16_t I2C_IT, FunctionalState NewState)
  *
  * @return  none
  */
-void I2C_SendData(RV_i2c_t *I2Cx, I2C_Ptr *I2C_px, uint8_t udma_addr_count,uint8_t *Data,uint8_t sizeof_data)
+uint8_t I2C_SendData(RV_i2c_t *I2Cx, I2C_Ptr *I2C_px, uint8_t udma_addr_count,uint8_t *Data,uint8_t sizeof_data)
 {
 
     uint8_t i=0;
@@ -296,8 +298,10 @@ void I2C_SendData(RV_i2c_t *I2Cx, I2C_Ptr *I2C_px, uint8_t udma_addr_count,uint8
     for (i = 0; i < sizeof_data ; i++)
     {
         /* code */
-        I2C_px->i2c_data_reg[temp+i]=Data[i];
+        temp=temp+i;
+        I2C_px->i2c_data_reg[temp] = Data[i];
     }
+    return temp;
 }
 
 /*********************************************************************

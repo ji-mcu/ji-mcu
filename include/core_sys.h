@@ -20,6 +20,14 @@ extern "C"
 
     typedef enum
     {
+        TIM_CLOCK_1M = 1000000,
+        TIM_CLOCK_8M = 8000000,
+        TIM_CLOCK_10M = 10000000,
+        TIM_CLOCK_11M = 11000000,
+        TIM_CLOCK_16M = 16000000,
+        TIM_CLOCK_24M = 24000000,
+        TIM_CLOCK_32M = 32000000,
+        TIM_CLOCK_48M = 48000000,
         TIM_CLOCK_64M = 64000000,
 
     } TIMClock_TypeDef;

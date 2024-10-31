@@ -199,13 +199,13 @@ typedef enum
  * @brief config pad_mux fun output for pad0 to pad15
  * @param PADFun 
  */
-void PAD_MUX_FUN0(PADFunTypeDef0 PADFun , FunctionalState Newstate);
+uint8_t PAD_MUX_FUN0(PADFunTypeDef0 PADFun , FunctionalState Newstate);
 
 /**
  * @brief config pad_mux fun output for pad16 to pad18
  * @param PADFun
  */
-void PAD_MUX_FUN1(PADFunTypeDef0 PADFun, FunctionalState Newstate);
+uint8_t PAD_MUX_FUN1(PADFunTypeDef1 PADFun, FunctionalState Newstate);
 
 /**
  * @brief   pPAD引脚配置输出功能

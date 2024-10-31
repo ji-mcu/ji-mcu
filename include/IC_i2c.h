@@ -88,7 +88,7 @@ void I2C_AcknowledgeConfig(I2C_Ptr *I2C_px, uint8_t udma_addr_count, FunctionalS
 void I2C_OwnAddress2Config(RV_i2c_t *I2Cx, uint8_t Address);
 // void I2C_GeneralCallCmd(RV_i2c_t *I2Cx, FunctionalState NewState);
 void I2C_ITConfig(RV_i2c_t *I2Cx, uint16_t I2C_IT, FunctionalState NewState);
-void I2C_SendData(RV_i2c_t *I2Cx, I2C_Ptr *I2C_px, uint8_t udma_addr_count, uint8_t *Data, uint8_t sizeof_data);
+uint8_t I2C_SendData(RV_i2c_t *I2Cx, I2C_Ptr *I2C_px, uint8_t udma_addr_count, uint8_t *Data, uint8_t sizeof_data);
 uint8_t I2C_ReceiveData(RV_i2c_t *I2Cx, I2C_Ptr *I2C_px, uint8_t udma_addr_count, uint8_t sizeof_data);
 void I2C_Send7bitAddress(RV_i2c_t *I2Cx, uint8_t Address, uint8_t I2C_Direction);
 uint16_t I2C_ReadRegister(RV_i2c_t *I2Cx, uint8_t I2C_Register);

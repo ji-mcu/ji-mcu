@@ -11,7 +11,9 @@
 #include "soc_common.h"
 
 #include "IC_timer.h"
-#ifdef timer_ok
+
+#ifdef timer1_ok
+
 /**
  * @brief  Deinitializes the TIMER peripheral registers to their default reset values..
  * @param  TIMx: select the TIMER peripheral.
@@ -20,19 +22,38 @@
  *   This parameter Contains parameters for TIMER initialization.
  * @retval None
  */
-void TIM_Init(TIM_InitTypeDef *TIM_InitStruct)
+void TMR_TimerInit(TIM_InitTypeDef *TIM_InitStruct, CFG_Selcet cfg_selct)
 {
-    TIMER_CFG = 0x00;
-    TIMER_CNT = 0x00;
-    TIMER_CMP = TIM_InitStruct->TIME_CMP;
-    TIMER_STP = TIM_InitStruct->TIME_STP;
-    SET_BIT(TIMER_CFG, TIM_InitStruct->TIME_INTEN);
-    if (TIM_InitStruct->TIME_INTEN)
+    uint32_t temreg = 0;
+
+    if (cfg_selct != cfg_lo)
     {
-        SET_BIT(INT_EN, IRQ_TIMER);
+        R32_timer1_cfg_hi = 0x00;
+        temreg |= (TIM_InitStruct->TIME_Mode | TIM_InitStruct->TIME_OutputClock | TIM_InitStruct->TIME_Start | TIM_InitStruct->TIME_Reset) & (TIM_InitStruct->Clock_Mux & TIM_InitStruct->TIME_INTEN);
+        R32_timer1_cmp_hi = TIM_InitStruct->TIME_CMP;
+        R32_timer1_cnt_hi = TIM_InitStruct->TIME_CNT;
+        SET_BIT(R32_timer1_cfg_hi, temreg);
+
+        // if (TIM_InitStruct->TIME_INTEN)
+        // {
+        //     SET_BIT(INT_EN, IRQ_TIMER);
+        // }
+        R32_timer1_start_hi = TIM_START_1;
     }
-    SET_BIT(TIMER_CFG, TIM_InitStruct->TIME_PERIODIC);
-    SET_BIT(TIMER_CFG, TIM_InitStruct->TIME_START);
+    else
+    {
+        R32_timer1_cfg_lo = 0x00;
+        temreg |= (TIM_InitStruct->TIME_Mode | TIM_InitStruct->TIME_OutputClock | TIM_InitStruct->TIME_Start | TIM_InitStruct->TIME_Reset) & (TIM_InitStruct->Clock_Mux & TIM_InitStruct->TIME_INTEN);
+        R32_timer1_cmp_lo = TIM_InitStruct->TIME_CMP;
+        R32_timer1_cnt_lo = TIM_InitStruct->TIME_CNT;
+        SET_BIT(R32_timer1_cfg_lo, temreg);
+
+        // if (TIM_InitStruct->TIME_INTEN)
+        // {
+        //     SET_BIT(INT_EN, IRQ_TIMER);
+        // }
+        R32_timer1_start_lo = TIM_START_1;
+    }
 }
 
 /**
@@ -44,51 +65,31 @@ void TIM_Init(TIM_InitTypeDef *TIM_InitStruct)
 void TIM_StructInit(TIM_InitTypeDef *TIM_InitStruct)
 {
     /* Set the default configuration */
-    TIM_InitStruct->Clock_Freq = 8000000;      // 系统时钟
-    TIM_InitStruct->TIME_START = 0x01;         // 启动定时器
-    TIM_InitStruct->TIME_INTEN = 0x01 << 1;    // 中断使能
-    TIM_InitStruct->TIME_PERIODIC = 0x01 << 2; // 周期触发
-    TIM_InitStruct->TIME_CMP = 7999;           // 初始值1ms中断触发
-    TIM_InitStruct->TIME_STP = 8000 * 10;      // 步进10ms
-    TIM_InitStruct->TIME_CNT = 0;              // 计数器初始值设为0
-}
 
-/**
- * @brief  Enables or disables the specified TIM peripheral.
- * @param  TIMx: select the TIMER peripheral.
- *   This parameter can be TIMER.
- * @param  NewState: new state of the TIMx peripheral.
- *   This parameter can be: ENABLE or DISABLE.
- * @retval None
- */
-void TIM_Cmd(FunctionalState NewState)
-{
-    if (NewState != DISABLE)
-    {
-        /* Enable the TIM Counter */
-        TIMER_CFG |= 0x01;
-    }
-    else
-    {
-        /* Disable the TIM Counter */
-        TIMER_CFG &= 0xFE;
-    }
+    TIM_InitStruct->Clock_Mux = (~REF_CLK_EN_BIT);    // 0:64M 1:10M
+    TIM_InitStruct->TIME_Mode = (uint32_t)(CMP_CLR_BIT);        // 连续比较功能
+    TIM_InitStruct->TIME_INTEN = (~IRQ_BIT);          // 中断使能禁止
+    TIM_InitStruct->TIME_OutputClock = (uint32_t)TIM_CLOCK_16M; // 分频系数配置
+    TIM_InitStruct->TIME_CNT = (uint32_t)0;                     // 计数器初始值设为0
+    TIM_InitStruct->TIME_CMP = (uint32_t)16000-1;                 // 计数1ms
+    TIM_InitStruct->TIME_Reset = TIME_START_0;
+    TIM_InitStruct->TIME_Start = TIM_START_1;
 }
 
 void TIM_ITConfig(FunctionalState NewState)
 {
-    if (NewState != DISABLE)
-    {
-        /* Enable the Interrupt sources */
-        TIMER_CFG |= 0x02;
-        SET_BIT(INT_EN, IRQ_TIMER);
-    }
-    else
-    {
-        /* Disable the Interrupt sources */
-        TIMER_CFG &= 0xFD;
-        CLEAR_BIT(INT_EN, IRQ_TIMER);
-    }
+    // if (NewState != DISABLE)
+    // {
+    //     /* Enable the Interrupt sources */
+    //     TIMER_CFG |= 0x02;
+    //     SET_BIT(INT_EN, IRQ_TIMER);
+    // }
+    // else
+    // {
+    //     /* Disable the Interrupt sources */
+    //     TIMER_CFG &= 0xFD;
+    //     CLEAR_BIT(INT_EN, IRQ_TIMER);
+    // }
 }
 
 /**
@@ -97,11 +98,13 @@ void TIM_ITConfig(FunctionalState NewState)
  *   This parameter can be TIMER.
  * @retval Counter Register value.
  */
-uint32_t TIM_GetCounter(void)
+uint32_t TIM_GetCounter_hi(CFG_Selcet cfg_selct)
 {
     uint32_t data = 0;
-
-    data = TIMER_CNT;
+    if (cfg_selct != cfg_lo)
+        data = R32_timer1_cnt_hi;
+    else
+        data = R32_timer1_cnt_lo;
 
     return data;
 }
@@ -113,10 +116,14 @@ uint32_t TIM_GetCounter(void)
  * @param  Counter: specifies the Counter register new value.
  * @retval None
  */
-void TIM_SetCounter(uint32_t Counter)
+void TIM_SetCounter_lo(uint32_t Counter, CFG_Selcet cfg_selct)
 {
-    /* Set the Counter Register value */
-    TIMER_CNT = Counter;
+    if (cfg_selct != cfg_lo)
+        /* Set the Counter Register value */
+        R32_timer1_cnt_hi = Counter;
+    else
+        /* Set the Counter Register value */
+        R32_timer1_cnt_lo = Counter;
 }
 
 /**
@@ -126,10 +133,13 @@ void TIM_SetCounter(uint32_t Counter)
  * @param  Compare: specifies the Capture Compare register new value.
  * @retval None
  */
-void TIM_SetCompare(uint32_t Compare)
+void TIM_SetCompare(uint32_t Compare, CFG_Selcet cfg_selct)
 {
     /* Set the Capture Compare1 Register value */
-    TIMER_CMP = Compare;
+    if (cfg_selct != cfg_lo)
+        R32_timer1_cmp_hi = Compare;
+    else
+        R32_timer1_cmp_lo = Compare;
 }
 
 /**
@@ -138,12 +148,13 @@ void TIM_SetCompare(uint32_t Compare)
  *   This parameter can be TIMER.
  * @retval Compare register value.
  */
-uint32_t TIM_GetCompare(void)
+uint32_t TIM_GetCompare(CFG_Selcet cfg_selct)
 {
     uint32_t data = 0;
-
-    data = TIMER_CMP;
-
+    if (cfg_selct != cfg_lo)
+        data = R32_timer1_cmp_hi;
+    else
+        data = R32_timer1_cmp_lo;
     return data;
 }
 
@@ -158,16 +169,16 @@ uint32_t TIM_GetCompare(void)
  */
 FlagStatus TIM_GetITStatus(uint32_t TIM_FLAG)
 {
-    ITStatus bitstatus = RESET;
-    if ((TIMER_CFG & TIM_FLAG) != (uint32_t)RESET)
-    {
-        bitstatus = SET;
-    }
-    else
-    {
-        bitstatus = RESET;
-    }
-    return bitstatus;
+    // ITStatus bitstatus = RESET;
+    // if ((TIMER_CFG & TIM_FLAG) != (uint32_t)RESET)
+    // {
+    //     bitstatus = SET;
+    // }
+    // else
+    // {
+    //     bitstatus = RESET;
+    // }
+    // return bitstatus;
 }
 /**
  * @brief  Clears the TIMx's interrupt pending bits.
@@ -180,7 +191,7 @@ FlagStatus TIM_GetITStatus(uint32_t TIM_FLAG)
 void TIM_ClearIT(uint32_t TIM_FLAG)
 {
     /* Clear the flags */
-    TIMER_CFG |= TIM_FLAG;
-    INT_CLR |= IRQ_TIMER;
+    // TIMER_CFG |= TIM_FLAG;
+    // INT_CLR |= IRQ_TIMER;
 }
 #endif

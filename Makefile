@@ -4,7 +4,7 @@ PULP_APP = vendor # 最终文件
 MAKEFILE_APP_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 # 查找src/下的所有.c文件和main.c文件
-EXCLUDE_SRCS = src/oled.c 
+EXCLUDE_SRCS = src/oled.c src/IC_timer1.c 
 PULP_APP_SRCS = $(filter-out $(EXCLUDE_SRCS), $(wildcard src/*.c))
 # PULP_APP_SRCS = $(wildcard src/*.c)
 

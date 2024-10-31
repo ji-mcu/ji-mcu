@@ -22,13 +22,13 @@ uint8_t PAD_MUX_FUN0(PADFunTypeDef0 PADFun, FunctionalState Newstate)
                 if (i % 2 == 0 && (i + 1 < 32) && (PADFun & (1UL << (i + 1))) != 0) // 偶数位的时候哦判断偶数位+1是否为是否为1,为1冲突
                 {
                     conflict = 1;
-                    printf("have conflict1\n");
+                    // printf("have conflict1\n");
                     break;
                 }
                 if (i % 2 == 1 && (i - 1 >= 0) && (PADFun & (1UL << (i - 1))) != 0) // 如果是奇数位，那么判断奇数位-1是否为1
                 {
                     conflict = 1;
-                    printf("have conflict1\n");
+                    // printf("have conflict1\n");
                     break;
                 }
             }
@@ -37,30 +37,77 @@ uint8_t PAD_MUX_FUN0(PADFunTypeDef0 PADFun, FunctionalState Newstate)
         if (!conflict)
         {
             PAD_FUN0 = (uint32_t)PADFun;
-            printf("config is ok \n");
-            return 0;
+            // printf("config is ok \n");
+            return TRUE;
         }
         else
         {
             PAD_FUN0 = (uint32_t)0;
-            printf("config is fail\n");
-            return 1; // 表示有冲突
+            // printf("config is fail\n");
+            return FALSE; // 表示有冲突
         }
     }
     else {
         PAD_FUN0 = (uint32_t)0;
-        printf("no config \n");
-        return 0;
+        // printf("no config \n");
+        return FALSE;
     }
-    return 0;
+
+    return FALSE;
 }
 
 /**
  * @brief config pad_mux fun output for pad16 to pad18
  * @param PADFun
  */
-void PAD_MUX_FUN1(PADFunTypeDef0 PADFun, FunctionalState Newstate)
+uint8_t PAD_MUX_FUN1(PADFunTypeDef1 PADFun, FunctionalState Newstate)
 {
+    // 检查是否有冲突的位
+    uint8_t conflict = 0;
+    if (Newstate != DISABLE)
+    {
+        for (int i = 0; i < 32; i++)
+        {
+            if ((PADFun & (1UL << i)) != 0) // 如果该位不为0,可能为奇数位也可能是偶数位
+            {
+
+                // 检查偶数位和奇数位的相邻位
+                if (i % 2 == 0 && (i + 1 < 32) && (PADFun & (1UL << (i + 1))) != 0) // 偶数位的时候哦判断偶数位+1是否为是否为1,为1冲突
+                {
+                    conflict = 1;
+                    // printf("have conflict1\n");
+                    break;
+                }
+                if (i % 2 == 1 && (i - 1 >= 0) && (PADFun & (1UL << (i - 1))) != 0) // 如果是奇数位，那么判断奇数位-1是否为1
+                {
+                    conflict = 1;
+                    // printf("have conflict1\n");
+                    break;
+                }
+            }
+        }
+        // 如果没有冲突，设置位
+        if (!conflict)
+        {
+            PAD_FUN1 = (uint32_t)PADFun;
+            // printf("config is ok \n");
+            return TRUE;
+        }
+        else
+        {
+            PAD_FUN1 = (uint32_t)0;
+            // printf("config is fail\n");
+            return FALSE; // 表示有冲突
+        }
+    }
+    else
+    {
+        PAD_FUN1 = (uint32_t)0;
+        // printf("no config \n");
+        return FALSE;
+    }
+
+    return FALSE;
 }
 
 /*********************************************************************

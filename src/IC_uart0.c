@@ -18,22 +18,24 @@
  *
  * @return  none
  */
-void UART0_DefInit(uint32_t baudrate , uint32_t byte_num)
+void UART0_DefInit(uint32_t baudrate , uint32_t byte_num  )
 {
-    UART0_BaudRateCfg(115200);
+    UART0_BaudRateCfg(baudrate);
+
 
     // R32_uart0_setup |= (uint16_t)Setup_parity_en;
-    R32_uart0_setup |= (uint16_t)UART_7BYTE_TRIG<<1;
-    R32_uart0_setup |= (uint16_t)UART_STOP_BIT_1<<3;//小心此处uin16类型转换出错
-    R32_uart0_setup |= (uint16_t)Setup_uart_en_rx;
-    R32_uart0_setup |= (uint16_t)Setup_uart_en_tx;
+    R32_uart0_setup |= (uint32_t)(1<<1|1<<2);
+    // R32_uart0_setup |= (uint16_t)UART_STOP_BIT_1<<3;//小心此处uin16类型转换出错
+    R32_uart0_setup |= (uint32_t)Setup_uart_en_rx;
+    R32_uart0_setup |= (uint32_t)Setup_uart_en_tx;
 
-    R32_uart0_rx_addr= R8_uart_rx_data;
-    R32_uart0_tx_addr= R8_uart_tx_data;
+    R32_uart0_rx_addr = RV_Udma_uart_RX_ADDR;
+    R32_uart0_tx_addr = RV_Udma_uart_TX_ADDR;
+    // R32_uart0_tx_addr = RV_Udma_uart_RX_ADDR;
     if(byte_num !=0 )
     {
-        R32_uart0_rxsize = (uint16_t)byte_num;
-        R32_uart0_tx_size= (uint16_t)byte_num;
+        R32_uart0_rxsize = (uint32_t)byte_num;
+        R32_uart0_tx_size= (uint32_t)byte_num;
     }
     else
     {
@@ -55,9 +57,10 @@ void UART0_BaudRateCfg(uint32_t baudrate)
 {
     uint32_t x;
 
-    x = TIM_CLOCK_64M / baudrate;
+    x = TIM_CLOCK_64M / baudrate - 1;
+    // x=baudrate;
 
-    R32_uart0_setup |= (uint16_t)x<<16;
+    R32_uart0_setup |= (uint32_t)x<<16;
 }
 
 /*********************************************************************
@@ -117,10 +120,13 @@ void UART0_Reset(void)
 
 void UART0_SendByte(uint8_t data)
 {
-    
-    R8_uart_tx_data = data ;
-    // pad_uart0->pad_uart_tx_data_reg[0] = data;
+    while ((R32_uart0_status & TX_FIFO_EMP) == 1)
+    {
+        ;
+    }
+    R8_uart_tx_data = data;
     R32_uart0_tx_cfg |= CFG_en;
+ 
 }
 
 /*********************************************************************
@@ -135,17 +141,21 @@ void UART0_SendByte(uint8_t data)
  */
 void UART0_SendString(uint8_t *buf, uint16_t l)
 {
-    uint16_t len = l;
-    R32_uart0_tx_size=len;
-    while (len)
+    uint16_t len= 0;
+    // R32_uart0_tx_size=len;
+    for (len = 0; len < l; len++)
     {
-        R32_uart0_tx_cfg |= CFG_en;
-        if (!(R32_uart0_status && TX_FIFO_EMP))
+        // R32_uart0_tx_cfg |= CFG_Clr;
+        if ((R32_uart0_status & TX_FIFO_EMP)==1)
         {
-            R8_uart_tx_data = *buf++;
-            len--;
+        // UART0_SendByte(buf[len]);
+            // *((volatile uint32_t *)((&R8_uart_tx_data) + len)) = buf[len];
+            udma_tx_ptr4->uart_data_reg[len]=buf[len];
+            // R8_uart_tx_data = buf[len];
+            // DelayUs(100);
         }
     }
+    R32_uart0_tx_cfg |= CFG_en;
 }
 /*********************************************************************
 /**
@@ -155,11 +165,18 @@ void UART0_SendString(uint8_t *buf, uint16_t l)
  */
 uint8_t UART0_RecvByte()
 {
-
-    // uint8_t data=pad_uart0->pad_uart_rx_data_reg[0];
-    uint8_t data = R8_uart_rx_data ;
+    // uint8_t data=0;
+    uint8_t flag=0;
     R32_uart0_rx_cfg |= CFG_en;
-    return data;
+    while ((R32_uart0_status & RX_DATA_RDY) == 0)
+    {
+
+        // data = R8_uart_rx_data;
+        flag=1 ;
+    }
+    // uint8_t data=pad_uart0->pad_uart_rx_data_reg[0];
+
+    return flag;
 }
 
 /*********************************************************************
@@ -173,20 +190,18 @@ uint8_t UART0_RecvByte()
  */
 uint16_t UART0_RecvString(uint16_t l)
 {
-    // uint16_t len = 0;
-    uint8_t buf[l];
 
-    uint16_t len = l;
-    R32_uart0_tx_size = len;
-    while (len<=l)
+    uint8_t len = 0;
+    R32_uart0_rx_cfg |= CFG_en;
+    while ((R32_uart0_status & RX_DATA_RDY) == 0)
     {
-        R32_uart0_rx_cfg |= CFG_en;
-        if (!(R32_uart0_status && RX_DATA_RDY))
-        {
-            buf[len] = R8_uart_rx_data;
 
-            len++;
-        }
+        // data = R8_uart_rx_data;
+        len ++;
     }
-    return *buf;
+    // uint8_t data=pad_uart0->pad_uart_rx_data_reg[0];
+    R32_uart0_tx_size = len;
+
+
+    return len;
 }

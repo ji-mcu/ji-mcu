@@ -111,7 +111,7 @@ void OLED_WR_Byte(uint8_t *dat)
 	hal_soc_i2c0_set(PERI_I2C0_TX_SIZE_ADDR, DATA_Len);
 	// hal_soc_i2c0_set(PERI_I2C0_SETUP_ADDR, (1 << 8 | 1 << 1 | 1 << 2)); // 8bits,no parity,1stopbit
 	hal_soc_i2c0_set(PERI_I2C0_TX_CFG_ADDR, (1 << 4)|(1<<0));
-	Delay(10000);
+	// Delay(10000);
 }
 /**
  * @brief  oled_cmd 写入oled指令

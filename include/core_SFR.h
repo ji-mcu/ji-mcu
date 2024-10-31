@@ -193,8 +193,8 @@ extern "C"
 #define R8_I2C_RX_data (*((PUINT8V)0x1c040000))//允许最多一次256字节
 #define R8_I2C_TX_data (*((PUINT8V)0x1c040100)) // 允许最多一次256字节
 
-#define R8_uart_tx_data (*((PUINT8V)(0x1c0400200)))//允许最多一次256字节
-#define R8_uart_rx_data (*((PUINT8V)(0x1c0400300)))//允许最多一次256字节
+#define R8_uart_tx_data (*((PUINT8V)(0x1c040200)))//允许最多一次256字节
+#define R8_uart_rx_data (*((PUINT8V)(0x1c040300)))//允许最多一次256字节
 
 /* GPIO register */
 #define PAD_FUN0 (*((PUINT32V)0x1A101010))       // RW, Config fun for pad0 to pad 15
@@ -250,7 +250,27 @@ extern "C"
 
 
 /*timer register*/
-// #define R32_timer
+#define R32_timer0_cfg_lo (*((PUINT32V)0x1a107000))
+#define R32_timer0_cfg_hi (*((PUINT32V)0x1a107004))
+#define R32_timer0_cnt_lo (*((PUINT32V)0x1a107008))
+#define R32_timer0_cnt_hi (*((PUINT32V)0x1a10700c))
+#define R32_timer0_cmp_lo (*((PUINT32V)0x1a107010))
+#define R32_timer0_cmp_hi (*((PUINT32V)0x1a107014))
+#define R32_timer0_start_lo (*((PUINT32V)0x1a107018))
+#define R32_timer0_start_hi (*((PUINT32V)0x1a10701c))
+#define R32_timer0_reset_lo (*((PUINT32V)0x1a107020))
+#define R32_timer0_reset_hi (*((PUINT32V)0x1a107024))
+
+#define R32_timer1_cfg_lo   (*((PUINT32V)0x1a107800))
+#define R32_timer1_cfg_hi   (*((PUINT32V)0x1a107804))
+#define R32_timer1_cnt_lo   (*((PUINT32V)0x1a107808))
+#define R32_timer1_cnt_hi   (*((PUINT32V)0x1a10780c))
+#define R32_timer1_cmp_lo   (*((PUINT32V)0x1a107810))
+#define R32_timer1_cmp_hi   (*((PUINT32V)0x1a107814))
+#define R32_timer1_start_lo (*((PUINT32V)0x1a107818))
+#define R32_timer1_start_hi (*((PUINT32V)0x1a10781c))
+#define R32_timer1_reset_lo (*((PUINT32V)0x1a107820))
+#define R32_timer1_reset_hi (*((PUINT32V)0x1a107824))
 
 // ================================================================
 // ================================================================
@@ -311,26 +331,30 @@ extern "C"
 #define pad_pwm ((RV_PWM_t *)RV_PERI_PWM_ADDR)
 
 // ================================================================
-#define RV_PERI_TIMER_ADDR 0x1A107000 // 定时器寄存器基地址
-
+#define RV_PERI_TIMER0_ADDR 0x1A107000 // 定时器寄存器基地址
+#define RV_PERI_TIMER1_ADDR 0x1A107800 // 定时器寄存器基地址
     typedef struct
     {
-        __IO u32 cfg_lo;               // 0x00 低16字节配置寄存器
-        __IO u32 cfg_hi;               // 0x04 低16字节配置寄存器
-        __IO u32 cnt_lo;               // 0x08 低16字节计数值寄存器
-        __IO u32 cnt_hi;               // 0x0c 低16字节计数值寄存器
-        __IO u32 cmp_lo;               // 0x10 低16字节比较值寄存器
-        __IO u32 cmp_hi;               // 0x14 低16字节比较值寄存器
-        __IO u32 start_lo;             // 0x18 低16字节启动定时器寄存器
-        __IO u32 start_hi;             // 0x1c 低16字节启动定时器寄存器
-        __IO u32 reset_lo;             // 0x20 低16字节复位定时器寄存器
-        __IO u32 reset_hi;             // 0x24 低16字节复位定时器寄存器
+        __IO u32 cfg_lo;               // 0x00 配置寄存器
+        __IO u32 cfg_hi;               // 0x04 配置寄存器
+        __IO u32 cnt_lo;               // 0x08 计数值寄存器
+        __IO u32 cnt_hi;               // 0x0c 计数值寄存器
+        __IO u32 cmp_lo;               // 0x10 比较值寄存器
+        __IO u32 cmp_hi;               // 0x14 比较值寄存器
+        __IO u32 start_lo;             // 0x18 启动定时器寄存器
+        __IO u32 start_hi;             // 0x1c 启动定时器寄存器
+        __IO u32 reset_lo;             // 0x20 复位定时器寄存器
+        __IO u32 reset_hi;             // 0x24 复位定时器寄存器
     } RV_timer_t;
-#define pad_timer ((RV_timer_t *)RV_PERI_TIMER_ADDR) // 获取定时器寄存器
+
+#define pad_timer0 ((RV_timer_t *)RV_PERI_TIMER0_ADDR) // 获取定时器寄存器
+#define pad_timer1 ((RV_timer_t *)RV_PERI_TIMER1_ADDR) // 获取定时器寄存器
 
 // ================================================================
 #define RV_Udma_I2C_RX_ADDR 0x1c040000 // can not over 0x1c04_7FFF ,32KB
 #define RV_Udma_I2C_TX_ADDR 0x1c040100 // can not over 0x1c04_7FFF ,32KB
+#define RV_Udma_uart_RX_ADDR 0x1c040300 // can not over 0x1c04_7FFF ,32KB
+#define RV_Udma_uart_TX_ADDR 0x1c040200 // can not over 0x1c04_7FFF ,32KB
 
     /**
      * @brief udam control
@@ -341,8 +365,19 @@ extern "C"
         __IO u8 i2c_data_reg[256-1];
     } I2C_Ptr;
 
-#define udma_rx_ptr1 ((udma_sram *)RV_Udma_I2C_RX_ADDR)      //
-#define udma_tx_ptr2 ((udma_sram *)RV_Udma_I2C_TX_ADDR)      //
+    /**
+     * @brief udam control
+     *
+     */
+    typedef struct
+    {
+        __IO u8 uart_data_reg[256 - 1];
+    } Uart_Ptr;
+
+#define udma_rx_ptr1 ((I2C_Ptr *)RV_Udma_I2C_RX_ADDR)        //
+#define udma_tx_ptr2 ((I2C_Ptr *)RV_Udma_I2C_TX_ADDR)        //
+#define udma_rx_ptr3 ((Uart_Ptr *)RV_Udma_uart_RX_ADDR)      //
+#define udma_tx_ptr4 ((Uart_Ptr *)RV_Udma_uart_TX_ADDR)      //
 
 // ================================================================
 #define RV_PERI_Uart0_ADDR 0x1A104080
@@ -394,8 +429,8 @@ typedef struct
     __IO u32 i2c_setup;//0x24
 }RV_i2c_t;
 
-#define pad_i2c0 ((RV_i2c_t)RV_PERI_I2C0_ADDR)
-#define pad_i2c1 ((RV_i2c_t)RV_PERI_I2C1_ADDR)
+#define pad_i2c0 ((RV_i2c_t *)RV_PERI_I2C0_ADDR)
+#define pad_i2c1 ((RV_i2c_t *)RV_PERI_I2C1_ADDR)
 // ================================================================
 #ifdef __cplusplus
 }

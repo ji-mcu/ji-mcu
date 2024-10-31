@@ -116,7 +116,7 @@ void UART1_Reset(void)
 
 void UART1_SendByte(uint8_t data)
 {
-
+    
     R8_uart_tx_data = data;
     // pad_uart0->pad_uart_tx_data_reg[0] = data;
     R32_uart1_tx_cfg |= CFG_en;
