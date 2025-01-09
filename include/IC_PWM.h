@@ -157,7 +157,7 @@ static uint16_t PWMX_cycle_table[16] = {
  *
  * @return  none
  */
-void PWMX_ACTOUT(uint8_t ch, uint16_t hi, uint16_t lo, FunctionalState s);
+void PWMX_ACTOUT(uint8_t ch, uint32_t hi, uint16_t lo, FunctionalState s);
 
     /*********************************************************************
      * @fn      pwm_steering_engine_init

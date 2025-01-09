@@ -96,7 +96,7 @@ uint16_t PWMX_CycleCfg(PWMX_CycleTypeDef cyc)
  *
  * @return  none
  */
-void PWMX_ACTOUT(uint8_t ch, uint16_t hi,uint16_t lo, FunctionalState s)
+void PWMX_ACTOUT(uint8_t ch, uint32_t hi,uint16_t lo, FunctionalState s)
 {
     uint8_t i;
 

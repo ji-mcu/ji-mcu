@@ -25,17 +25,19 @@
  */
 void TMR_TimerInit(TIM_InitTypeDef *TIM_InitStruct, CFG_Selcet cfg_selct)
 {
-    uint32_t temreg = 0;
-    uint32_t prescaler=0;
+    uint32_t temreg ;
+    uint8_t prescaler;
+    prescaler = TIM_CLOCK_64M / TIM_InitStruct->TIME_OutputClock - 1;
+    // temreg |= (TIM_InitStruct->TIME_Mode | prescaler | TIM_InitStruct->TIME_Start | TIM_InitStruct->TIME_Reset) & (TIM_InitStruct->Clock_Mux & TIM_InitStruct->TIME_INTEN);
 
-
-    if(cfg_selct !=cfg_hi){
+    if(cfg_selct ==cfg_hi){
     // R32_timer0_cfg_hi = 0x00;
-    prescaler = TIM_CLOCK_64M/TIM_InitStruct->TIME_OutputClock -1 ;
-    temreg |= (TIM_InitStruct->TIME_Mode | prescaler | TIM_InitStruct->TIME_Start | TIM_InitStruct->TIME_Reset) & (TIM_InitStruct->Clock_Mux & TIM_InitStruct->TIME_INTEN);
+    // prescaler = TIM_CLOCK_64M/TIM_InitStruct->TIME_OutputClock -1 ;
+    // temreg |= (TIM_InitStruct->TIME_Mode | prescaler | TIM_InitStruct->TIME_Start | TIM_InitStruct->TIME_Reset) & (TIM_InitStruct->Clock_Mux & TIM_InitStruct->TIME_INTEN);
     R32_timer0_cmp_hi = TIM_InitStruct->TIME_CMP;
     R32_timer0_cnt_hi = TIM_InitStruct->TIME_CNT;
-    SET_BIT(R32_timer0_cfg_hi, temreg);
+    // SET_BIT(R32_timer0_cfg_hi, temreg);
+    R32_timer0_cfg_hi = (prescaler << 8 | ENABLE_BIT | RESET_BIT | IRQ_BIT | CMP_CLR_BIT | ONE_SHOT_BIT | REF_CLK_EN_BIT | REF_CLK_MUX);
 
     // if (TIM_InitStruct->TIME_INTEN)
     // {
@@ -44,13 +46,11 @@ void TMR_TimerInit(TIM_InitTypeDef *TIM_InitStruct, CFG_Selcet cfg_selct)
     R32_timer0_start_hi = TIM_START_1;
     }
     else{
-    // R32_timer0_cfg_lo = 0x00;
-    prescaler = TIM_CLOCK_64M / TIM_InitStruct->TIME_OutputClock - 1;
-    temreg |= (TIM_InitStruct->TIME_Mode | prescaler | TIM_InitStruct->TIME_Start | TIM_InitStruct->TIME_Reset) & (TIM_InitStruct->Clock_Mux & TIM_InitStruct->TIME_INTEN);
+
     R32_timer0_cmp_lo = TIM_InitStruct->TIME_CMP;
     R32_timer0_cnt_lo = TIM_InitStruct->TIME_CNT;
-    SET_BIT(R32_timer0_cfg_lo, temreg);
-
+    // SET_BIT(R32_timer0_cfg_lo, temreg);
+    R32_timer0_cfg_lo = (prescaler << 8 | ENABLE_BIT | RESET_BIT | IRQ_BIT | CMP_CLR_BIT | ONE_SHOT_BIT | REF_CLK_EN_BIT | REF_CLK_MUX);
     // if (TIM_InitStruct->TIME_INTEN)
     // {
     //     SET_BIT(INT_EN, IRQ_TIMER);
@@ -69,12 +69,12 @@ void TIM_StructInit(TIM_InitTypeDef *TIM_InitStruct)
 {
     /* Set the default configuration */
 
-    TIM_InitStruct->Clock_Mux = (~REF_CLK_EN_BIT); //0:64M 1:10M
-    TIM_InitStruct->TIME_Mode = (uint32_t)(CMP_CLR_BIT);    //连续比较功能
-    TIM_InitStruct->TIME_INTEN = (~IRQ_BIT);      // 中断使能禁止
-    TIM_InitStruct->TIME_OutputClock = (uint32_t)TIM_CLOCK_16M; // 分频系数配置
-    TIM_InitStruct->TIME_CNT = (uint32_t)0;                 // 计数器初始值设为0
-    TIM_InitStruct->TIME_CMP = (uint32_t)16000;             // 初始值1ms中断触发
+    TIM_InitStruct->Clock_Mux = (REF_CLK_EN_BIT); //0:64M 1:10M
+    TIM_InitStruct->TIME_Mode = (CMP_CLR_BIT);    //连续比较功能
+    TIM_InitStruct->TIME_INTEN = (IRQ_BIT);      // 中断使能
+    TIM_InitStruct->TIME_OutputClock = TIM_CLOCK_16M; // 分频系数配置
+    TIM_InitStruct->TIME_CNT = 0;                 // 计数器初始值设为0
+    TIM_InitStruct->TIME_CMP = 16000;             // 初始值1ms中断触发
     TIM_InitStruct->TIME_Reset = TIME_START_0;
     TIM_InitStruct->TIME_Start =TIM_START_1;
 }

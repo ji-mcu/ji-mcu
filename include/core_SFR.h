@@ -3,10 +3,10 @@
 /* Author:   huangjin 2024/7/30   */
 /* V0.1 SpecialFunctionRegister */
 
-#ifndef __ARCHI_PULPISSIMO_MEMORY_MAP_H_CORE_SFR__
-#define __ARCHI_PULPISSIMO_MEMORY_MAP_H_CORE_SFR__
+#ifndef __H_CORE_SFR__
+#define __H_CORE_SFR__
 
-#include"soc_common.h"
+
 
 #ifdef __cplusplus
 extern "C"
@@ -14,6 +14,12 @@ extern "C"
 #endif
     /* ********************************************************************************************************************* */
     /* Base types & constants */
+
+// #include "soc_common.h"
+#include <string.h>
+#include <stdint.h>
+#include <stdio.h>
+#include "core_sys.h"
 
 #ifndef TRUE
 #define TRUE 1
@@ -187,6 +193,53 @@ extern "C"
    Others for register address offset */
 /* ********************************************************************************************************************* */
 
+#define R32_SOC_EU_EVENT     (*((volatile uint32_t *)0x1a102000))
+#define R32_SOC_FC_MASK_MSB  (*((volatile uint32_t *)0x1a102004))
+#define R32_SOC_FC_MASK_LSB  (*((volatile uint32_t *)0x1a102008))
+#define R32_SOC_ERR_MSB      (*((volatile uint32_t *)0x1a10201c))
+#define R32_SOC_ERR_LSB      (*((volatile uint32_t *)0x1a102020))
+#define R32_SOC_TIMER_SEL_HI (*((volatile uint32_t *)0x1a102024))
+#define R32_SOC_TIMER_SEL_LO (*((volatile uint32_t *)0x1a102028))
+
+#define Interrupt_ADDR        0x1a105000
+#define ITC_MASK              (*((volatile uint32_t *)0x1a105000))
+#define ITC_MASK_SET          (*((volatile uint32_t *)0x1a105004))
+#define ITC_MASK_CLR          (*((volatile uint32_t *)0x1a105008))
+#define ITC                   (*((volatile uint32_t *)0x1a10500c))
+#define ITC_SET               (*((volatile uint32_t *)0x1a105010))
+#define ITC_CLR               (*((volatile uint32_t *)0x1a105014))
+#define ITC_ACK               (*((volatile uint32_t *)0x1a105018))
+#define ITC_ACK_SET           (*((volatile uint32_t *)0x1a10501c))
+#define ITC_ACK_CLR           (*((volatile uint32_t *)0x1a105020))
+#define ITC_FIFO              (*((volatile uint32_t *)0x1a105024))
+
+#define R32_info (*((PUINT8V)0x1a101000)) //mcu and clusters info
+#define R32_boot_addr (*((PUINT32V)0x1a101004)) //程序启动地址配置寄存器
+#define R32_fect (*((PUINT8V)0x1a101008)) //取指使能 1使能
+#define PAD_FUN0 (*((PUINT32V)0x1a101010)) // RW, Config fun for pad0 to pad 15
+#define PAD_FUN1 (*((PUINT32V)0x1a101014)) // RW, Config fun for pad16 to pad 18
+#define R32_mbist_cfg (*((PUINT8V)0x1a101080))    //
+#define R32_mbist_status (*((PUINT8V)0x1a101084)) //
+#define R32_sensor_id (*((PUINT8V)0x1a101088))    //
+#define R32_spim_cfg (*((PUINT8V)0x1a10108c))     //cfg[1]=d2d_wp cdf[0]=d2p_hold
+#define R32_ram_clkgate_en (*((PUINT8V)0x1a1090)) //
+#define R32_ip_clkgate_en (*((PUINT8V)0x1a1094)) //
+#define R32_core_status (*((PUINT8V)0x1a1010a0))    //core状态寄存器 程序运行完毕返回值0x8000—0000
+#define R32_core_rstn (*((PUINT8V)0x1a1010cc)) //软件复位 cfg[0]=core reset cfg[1]=udmareset. cfg[3]=mbis reset
+
+#define R8_CMD0 (*((volatile uint8_t *)0x1a100800)) // 配置PD 、PDMCK PLBYP 、PLL_ITVCO 默认分别为0、0、0、0010
+#define R8_CMD1 (*((volatile uint8_t *)0x1a100804)) // 配置PLL_RC 、PLL_PLCC，默认位1、 01000
+#define R8_CMD2 (*((volatile uint8_t *)0x1a100808)) // 配置PLM,默认7'b0111110
+#define R8_CMD3 (*((volatile uint8_t *)0x1a10080c)) // 配置PLN,默认6'b001010
+#define R8_CMD4 (*((volatile uint8_t *)0x1a100810)) // 配置PLL_Test_en、PLL_RSTB、PLLR，默认分别为'b0,'b1,'b1000
+#define R8_CMD5 (*((volatile uint8_t *)0x1a100814)) // BGR_TRIM 默认'b100， ICELL_TRIM,默认5‘b01000
+#define R8_CMD6 (*((volatile uint8_t *)0x1a100818)) // LDO18_EN,默认1‘b0,DAC12_EN 默认1’b0,SARADC_PD ，默认1'b1 , D2A_ADC_Chanelsel 默认1‘b0
+#define R8_ADC_CLK (*((volatile uint8_t *)0x1a10081c)) // ADC_CLK_12M 默认为1
+#define R8_CMD8 (*((volatile uint8_t *)0x1a100820)) // DAC12_SEL[7:0]=8'b00000001
+#define R8_CMD9 (*((volatile uint8_t *)0x1a100824)) // DAC12_SEL[11:8]=4'b0000
+#define R8_CMD10_ADC (*((volatile uint8_t *)0x1a100828)) // get adc value
+#define R8_CMD11 (*((volatile uint8_t *)0x1a10082c))     // eeror 1'b0
+
 /* Udma controler & share cache*/
 #define I2C_data_byte 3
 #define Uart_data_byte 1
@@ -196,9 +249,14 @@ extern "C"
 #define R8_uart_tx_data (*((PUINT8V)(0x1c040200)))//允许最多一次256字节
 #define R8_uart_rx_data (*((PUINT8V)(0x1c040300)))//允许最多一次256字节
 
+#define R8_i2s_tx_data (*((PUINT8V)(0x1c040400))) // 允许最多一次256字节
+#define R8_i2s_rx_data (*((PUINT8V)(0x1c040500))) // 允许最多一次256字节
+
+#define R8_spi_tx_data (*((PUINT8V)(0x1c040600))) // 允许最多一次256字节
+#define R8_spi_rx_data (*((PUINT8V)(0x1c040700))) // 允许最多一次256字节
+
 /* GPIO register */
-#define PAD_FUN0 (*((PUINT32V)0x1A101010))       // RW, Config fun for pad0 to pad 15
-#define PAD_FUN1 (*((PUINT32V)0x1A101014))       // RW, Config fun for pad16 to pad 18
+
 #define R32_P_DIR       (*((PUINT32V)0x1A100000)) // RW, GPIO  I/O direction: 0=in, 1=out
 #define R32_P_PIN       (*((PUINT32V)0x1A100004)) // RO, GPIO input when use it , need enable gpio
 #define R32_P_POUT      (*((PUINT32V)0x1A100008)) // RW, GPIO output
@@ -227,7 +285,7 @@ extern "C"
 
 /*uart 0/1 register*/
 #define R32_uart0_rx_addr (*((PUINT32V)0x1A104080))     
-#define R32_uart0_rxsize  (*((PUINT32V)0x1a104084))     
+#define R32_uart0_rx_size (*((PUINT32V)0x1a104084))     
 #define R32_uart0_rx_cfg  (*((PUINT32V)0x1a104088))     
 #define R32_uart0_rx_int  (*((PUINT32V)0x1a10408c))     
 #define R32_uart0_tx_addr (*((PUINT32V)0x1A104090))     
@@ -238,7 +296,7 @@ extern "C"
 #define R32_uart0_setup   (*((PUINT32V)0x1a1040a4))     
 
 #define R32_uart1_rx_addr (*((PUINT32V)0x1A104100))         
-#define R32_uart1_rxsize  (*((PUINT32V)0x1a104104))         
+#define R32_uart1_rx_size (*((PUINT32V)0x1a104104))         
 #define R32_uart1_rx_cfg  (*((PUINT32V)0x1a104108))         
 #define R32_uart1_rx_int  (*((PUINT32V)0x1a10410c))         
 #define R32_uart1_tx_addr (*((PUINT32V)0x1A104110))         
@@ -271,6 +329,34 @@ extern "C"
 #define R32_timer1_start_hi (*((PUINT32V)0x1a10781c))
 #define R32_timer1_reset_lo (*((PUINT32V)0x1a107820))
 #define R32_timer1_reset_hi (*((PUINT32V)0x1a107824))
+
+// LIN addresss
+#define Lin_CR (*((PUINT32V)0x1a103800))
+#define Lin_CSR (*((PUINT32V)0x1a103804))
+#define Lin_IER (*((PUINT32V)0x1a103808))
+#define Lin_ISR (*((PUINT32V)0x1a10380c))
+#define Lin_ID (*((PUINT32V)0x1a103810))
+#define Lin_DATA (*((PUINT32V)0x1a103814))
+#define Lin_DIV (*((PUINT32V)0x1a103818))
+
+
+/*spi 0/1 register*/
+#define R32_spi1_rx_addr (*((PUINT32V)0x1A104280))     
+#define R32_spi1_rx_size (*((PUINT32V)0x1a104284))     
+#define R32_spi1_rx_cfg  (*((PUINT32V)0x1a104288))     
+
+#define R32_spi1_tx_addr (*((PUINT32V)0x1A104290))     
+#define R32_spi1_tx_size (*((PUINT32V)0x1a104294))     
+#define R32_spi1_tx_cfg  (*((PUINT32V)0x1a104298))     
+
+#define R32_spi2_rx_addr (*((PUINT32V)0x1A104300))         
+#define R32_spi2_rx_size (*((PUINT32V)0x1a104304))         
+#define R32_spi2_rx_cfg  (*((PUINT32V)0x1a104308))         
+
+#define R32_spi2_tx_addr (*((PUINT32V)0x1A104310))         
+#define R32_spi2_tx_size (*((PUINT32V)0x1a104314))         
+#define R32_spi2_tx_cfg  (*((PUINT32V)0x1a104318))         
+
 
 // ================================================================
 // ================================================================
@@ -351,19 +437,47 @@ extern "C"
 #define pad_timer1 ((RV_timer_t *)RV_PERI_TIMER1_ADDR) // 获取定时器寄存器
 
 // ================================================================
-#define RV_Udma_I2C_RX_ADDR 0x1c040000 // can not over 0x1c04_7FFF ,32KB
-#define RV_Udma_I2C_TX_ADDR 0x1c040100 // can not over 0x1c04_7FFF ,32KB
+#define RV_Udma_CMD_ADDR    0x1C040000
+// #define RV_Udma_I2C_RX_ADDR 0x1c040000 // can not over 0x1c04_7FFF ,32KB
+#define RV_Udma_I2C_DATA_ADDR 0x1c040100 // can not over 0x1c04_7FFF ,32KB
+
 #define RV_Udma_uart_RX_ADDR 0x1c040300 // can not over 0x1c04_7FFF ,32KB
 #define RV_Udma_uart_TX_ADDR 0x1c040200 // can not over 0x1c04_7FFF ,32KB
+#define RV_Udma_i2s_RX_ADDR 0x1c040500 // can not over 0x1c04_7FFF ,32KB
+#define RV_Udma_i2s_TX_ADDR 0x1c040400 // can not over 0x1c04_7FFF ,32KB
+#define RV_Udma_SPI_DATA_ADDR 0x1c041000 // can not over 0x1c04_7FFF ,32KB
+#define RV_Udma_spi_TX_ADDR 0x1c040600 // can not over 0x1c04_7FFF ,32KB
+
+    typedef struct
+    {
+        __IO u8 cmd[32];
+    } udma_cmd_t;
+    /**
+     * @brief udam control
+     *
+     */
+    typedef struct
+    {
+        __IO u8 cmd[7];
+        __IO u8 i2c_data[256-1];
+    } udma_i2c_data_t;
+    /**
+     * @brief udam control
+     *
+     */
+    typedef struct
+    {
+        __IO u8 uart_data_reg[256-1];
+    } udma_uart_data_t;
 
     /**
      * @brief udam control
      *
      */
-    typedef struct 
-    {
-        __IO u8 i2c_data_reg[256-1];
-    } I2C_Ptr;
+    typedef struct
+    {   
+        __IO u32 spi_data[256-1];
+    } udma_spi_data_t;
 
     /**
      * @brief udam control
@@ -371,13 +485,15 @@ extern "C"
      */
     typedef struct
     {
-        __IO u8 uart_data_reg[256 - 1];
-    } Uart_Ptr;
+        __IO u32 spi_cmd[7];
+    } udma_spi_cmd_t;
 
-#define udma_rx_ptr1 ((I2C_Ptr *)RV_Udma_I2C_RX_ADDR)        //
-#define udma_tx_ptr2 ((I2C_Ptr *)RV_Udma_I2C_TX_ADDR)        //
-#define udma_rx_ptr3 ((Uart_Ptr *)RV_Udma_uart_RX_ADDR)      //
-#define udma_tx_ptr4 ((Uart_Ptr *)RV_Udma_uart_TX_ADDR)      //
+#define udma_i2c_data ((udma_i2c_data_t *)RV_Udma_I2C_DATA_ADDR) //
+#define udma_i2c_cmd ((udma_cmd_t *)RV_Udma_CMD_ADDR)            //
+#define udma_spi_cmd ((udma_spi_cmd_t *)RV_Udma_CMD_ADDR)
+#define udma_rx_ptr3 ((udma_uart_data_t *)RV_Udma_uart_RX_ADDR) //
+#define udma_tx_ptr4 ((udma_uart_data_t *)RV_Udma_uart_TX_ADDR) //
+#define udma_spi_data ((udma_spi_data_t *)RV_Udma_SPI_DATA_ADDR) //
 
 // ================================================================
 #define RV_PERI_Uart0_ADDR 0x1A104080
@@ -432,6 +548,30 @@ typedef struct
 #define pad_i2c0 ((RV_i2c_t *)RV_PERI_I2C0_ADDR)
 #define pad_i2c1 ((RV_i2c_t *)RV_PERI_I2C1_ADDR)
 // ================================================================
+
+#define RV_PERI_SPI1_ADDR 0x1A104280
+#define RV_PERI_SPI2_ADDR 0x1A104300
+#define RV_PERI_SPI1_TX_ADDR (RV_PERI_SPI1_ADDR+0x10)
+#define RV_PERI_SPI2_TX_ADDR (RV_PERI_SPI2_ADDR+0x10)
+/**
+ * @brief i2c struct def
+ */
+typedef struct
+{
+    __IO u32 spi_rx_addr; // 0x00
+    __IO u32 spi_rx_szie; // 0x04
+    __IO u32 spi_rx_cfg;  // 0x08
+    u32 spi_rx_reserve;   // 0x0c
+    __IO u32 spi_tx_addr; // 0x10
+    __IO u32 spi_tx_szie; // 0x14
+    __IO u32 spi_tx_cfg;  // 0x18
+    u32 spi_tx_reserve;   // 0x1c
+} RV_spi_t;
+
+#define pad_spi0 ((RV_spi_t *)RV_PERI_SPI0_ADDR)
+#define pad_spi1 ((RV_spi_t *)RV_PERI_SPI1_ADDR)
+    // ================================================================
+
 #ifdef __cplusplus
 }
 #endif

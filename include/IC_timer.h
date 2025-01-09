@@ -51,16 +51,16 @@ typedef enum
 /**
  * @brief  TMR cfg register define
  */
-#define ENABLE_BIT              (uint32_t)1<<0 //bit0
-#define RESET_BIT               (uint32_t)1<<1//bit1 
-#define IRQ_BIT                 (uint32_t)1<<2//bit 2
-#define CMP_CLR_BIT             (uint32_t)1<<4// bit 4 
-#define ONE_SHOT_BIT            (uint32_t)1<<5//bit 5
-#define PRESCALER_EN_BIT        (uint32_t)1<<6//bit 6
-#define REF_CLK_EN_BIT          (uint32_t)1<<7//bit 7
-#define PRESCALER_START_BIT     (uint32_t)1<<8// bit8
-#define PRESCALER_STOP_BIT      (uint32_t)1<<15// bit 15
-#define MODE_64_BIT             (uint32_t)1<<31//bit31
+#define ENABLE_BIT              1<<0 //bit0
+#define RESET_BIT               0<<1//bit1 
+#define IRQ_BIT                 1<<2//bit 2
+#define CMP_CLR_BIT             1<<4// bit 4 
+#define ONE_SHOT_BIT            0<<5//bit 5
+#define REF_CLK_EN_BIT          1<<6//bit 6
+#define REF_CLK_MUX             0<<7//bit 7
+#define PRESCALER_START_BIT     1<<8// bit8
+#define PRESCALER_STOP_BIT      1<<15// bit 15
+#define MODE_64_BIT             0<<31//bit31
 // CFG
 #define TIME_START_0 ((uint32_t)0x00)
 #define TIM_START_1  ((uint32_t)0x01)
@@ -88,6 +88,10 @@ typedef enum
  * @brief   关闭 TMR0-lo
  */
 #define TMR0_Disablelo() (R32_timer0_cfg_lo &= ~TIM_START_1)
+/**
+ * @brief  复位 TMR0-lo
+ */
+#define TMR0_Resetlo() (R32_timer0_reset_lo = TIM_START_1)
 
 /**
  * @brief   开启 TMR0-lo

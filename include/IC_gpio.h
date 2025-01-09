@@ -20,6 +20,10 @@
 
 #include "core_riscv.h"
 #include "core_SFR.h"
+#include <string.h>
+#include <stdint.h>
+#include <stdio.h>
+#include "hal/pulp_io.h"
 
 
 /**
@@ -229,21 +233,15 @@ void GPIOA_ModeCfg(uint32_t pin, GPIOModeTypeDef mode);
  *
  * @param   pin     - PA0-PA18
  */
-#define GPIOA_ResetBits(pin) (R32_P_CLR |= pin)
+#define GPIOA_SetBits(pin) (R32_P_CLR |= pin)
 
 /**
  * @brief   GPIO端口引脚输出置高
  *
  * @param   pin     - P0-P18
  */
-#define GPIOA_SetBits(pin) (R32_P_PSET |= pin)
+#define GPIOA_ResetBits(pin) (R32_P_PSET |= pin)
 
-/**
- * @brief   GPIO端口引脚输出电平翻转
- *
- * @param   pin     - P0-P18
- */
-#define GPIOA_InverseBits(pin) (R32_P_PSET ^= pin)
 
 /**
  * @brief   GPIO端口32位数据返回，低19位有效

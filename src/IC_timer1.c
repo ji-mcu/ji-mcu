@@ -12,7 +12,7 @@
 
 #include "IC_timer.h"
 
-#ifdef timer1_ok
+#ifndef timer1_ok
 
 /**
  * @brief  Deinitializes the TIMER peripheral registers to their default reset values..

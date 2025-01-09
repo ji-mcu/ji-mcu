@@ -18,30 +18,39 @@
  *
  * @return  none
  */
-void UART0_DefInit(uint32_t baudrate , uint32_t byte_num  )
+void UART0_DefInit(Uart_InitTypeDef *uart_InitStruct)
 {
-    UART0_BaudRateCfg(baudrate);
-
-
-    // R32_uart0_setup |= (uint16_t)Setup_parity_en;
-    R32_uart0_setup |= (uint32_t)(1<<1|1<<2);
+    // UART0_BaudRateCfg(baudrate);
+    uint32_t baudrate=0;
+    baudrate = (TIM_CLOCK_64M / uart_InitStruct->uart_ClockSpeed )- 1 ;
+    R32_uart0_setup |= (uint32_t)(baudrate << 16);
+    R32_uart0_setup |= (uint32_t)uart_InitStruct->uart_StopBit;
+    R32_uart0_setup |= (uint32_t)(uart_InitStruct->uart_ByeCFG<<1);
     // R32_uart0_setup |= (uint16_t)UART_STOP_BIT_1<<3;//小心此处uin16类型转换出错
-    R32_uart0_setup |= (uint32_t)Setup_uart_en_rx;
-    R32_uart0_setup |= (uint32_t)Setup_uart_en_tx;
+    R32_uart0_setup |= (uint32_t)uart_InitStruct->uart_Rxen;
+    R32_uart0_setup |= (uint32_t)uart_InitStruct->uart_Txen;
 
-    R32_uart0_rx_addr = RV_Udma_uart_RX_ADDR;
-    R32_uart0_tx_addr = RV_Udma_uart_TX_ADDR;
+    R32_uart0_rx_addr = uart_InitStruct->uart_rx_addr;
+    R32_uart0_tx_addr = uart_InitStruct->uart_tx_addr;
     // R32_uart0_tx_addr = RV_Udma_uart_RX_ADDR;
-    if(byte_num !=0 )
-    {
-        R32_uart0_rxsize = (uint32_t)byte_num;
-        R32_uart0_tx_size= (uint32_t)byte_num;
-    }
-    else
-    {
-        R32_uart0_rxsize = 1;
-        R32_uart0_tx_size= 1;
-    }
+
+    R32_uart0_rx_size = (uint32_t)uart_InitStruct->uart_rx_size;
+    R32_uart0_tx_size = (uint32_t)uart_InitStruct->uart_tx_size;
+
+
+}
+
+void uart_StructInit(Uart_InitTypeDef *uart_InitStruct)
+{
+    uart_InitStruct->uart_ClockSpeed = 19200;
+    uart_InitStruct->uart_ByeCFG = UART_7BYTE_TRIG ;
+    uart_InitStruct->uart_StopBit = UART_STOP_BIT_1;
+    uart_InitStruct->uart_Txen = Setup_uart_en_tx;
+    uart_InitStruct->uart_Rxen = Setup_uart_en_rx;
+    uart_InitStruct->uart_rx_size = 1;
+    uart_InitStruct->uart_tx_size = 1;
+    uart_InitStruct->uart_rx_addr = RV_Udma_uart_RX_ADDR;
+    uart_InitStruct->uart_tx_addr = RV_Udma_uart_TX_ADDR;
 }
 
 /*********************************************************************
@@ -145,17 +154,19 @@ void UART0_SendString(uint8_t *buf, uint16_t l)
     // R32_uart0_tx_size=len;
     for (len = 0; len < l; len++)
     {
+        // while ((R32_uart0_status & TX_FIFO_EMP) == 1);
         // R32_uart0_tx_cfg |= CFG_Clr;
+        UART0_SendByte(buf[len]);
         if ((R32_uart0_status & TX_FIFO_EMP)==1)
         {
-        // UART0_SendByte(buf[len]);
             // *((volatile uint32_t *)((&R8_uart_tx_data) + len)) = buf[len];
             udma_tx_ptr4->uart_data_reg[len]=buf[len];
             // R8_uart_tx_data = buf[len];
             // DelayUs(100);
         }
     }
-    R32_uart0_tx_cfg |= CFG_en;
+
+    // R32_uart0_tx_cfg |= CFG_en;
 }
 /*********************************************************************
 /**

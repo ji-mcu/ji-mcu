@@ -2,7 +2,7 @@
 
 #include "IC_gpio.h"
 
-#include "soc_common.h"
+// #include "soc_common.h"
 
 /**
  * @brief config pad_mux fun output for pad0 to pad15
@@ -160,10 +160,11 @@ void GPIOA_ITModeCfg(uint32_t pin, GPIOITModeTpDef mode)
         pin_number++;
     }
 
+
     switch (mode)
     {
     case GPIO_ITMode_doubleEdge: //双边沿触发
-        R32_P_INTTYPE |= pin<<(pin_number+1);
+        R32_P_INTTYPE = pin<<(pin_number+1);
         R32_P_CLR |= pin;
         break;
     case GPIO_ITMode_FallEdge: // 下降沿触发
@@ -173,15 +174,16 @@ void GPIOA_ITModeCfg(uint32_t pin, GPIOITModeTpDef mode)
         break;
 
     case GPIO_ITMode_RiseEdge: // 上升沿触发
-        R32_P_INTTYPE |= pin << (pin_number);
+        R32_P_INTTYPE = pin << (pin_number);
         R32_P_PSET |= pin;
         break;
 
     default:
         break;
     }
-    R32_P_INTSTATUS = 0;
-    R32_P_INTEN |= pin;
+    // R32_P_INTSTATUS = 0;
+    // R32_P_INTEN = pin;
+    (*((PUINT32V)0x1A10000C))=0x02;
 }
 
 /*********************************************************************

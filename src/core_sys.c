@@ -7,8 +7,9 @@
  *********************************************************************************
  *******************************************************************************/
 
-#include "soc_common.h"
-
+// #include "soc_common.h"
+#include "core_sys.h"
+#include "hal/pulp_io.h"
 /*********************************************************************
  * @fn      SetSysClock
  *
@@ -18,11 +19,36 @@
  *
  * @return  none
  */
-// __attribute__((section(".highcode"))) 
-void SetSysClock(uint16_t sc)
+// __attribute__((section(".vectors")))
+void SetSysClock(TIMClock_TypeDef sysfreq)
 {
-    __nop();
+    uint32_t tempreg;
+    tempreg= sysfreq/1000000 - 2;
+   //系统频率计算公式：24*(PLM+2)/(PLN+2)/2
+    R8_CMD2 = ((uint8_t)tempreg & D2A_PLL_PLM);
+    // R8_CMD3 
+
 }
+/*********************************************************************
+ * @fn      SystemInit
+ *
+ * @brief  
+ *
+ * @param   
+ *
+ * @return  none
+ */
+void SystemInit()
+{
+   SetSysClock(TIM_CLOCK_64M);
+    __nop();
+    __nop();
+    __nop();
+    // soc_boorctrl((uint32_t)0x1c020000);
+    R32_boot_addr = 0x1c020000;
+    SYS_ResetExecute();
+}
+
 
 /*********************************************************************
  * @fn      GetSysClock
@@ -35,7 +61,14 @@ void SetSysClock(uint16_t sc)
  */
 uint32_t GetSysClock(void)
 {
-    __nop();
+    uint32_t sysfreq=0;
+    uint32_t tempreg1=R8_CMD2;
+    uint32_t tempreg2=R8_CMD3;
+    // tempreg = sysfreq / 1000000 - 2;
+    // 系统频率计算公式：24*(PLM+2)/(PLN+2)/2
+
+    sysfreq = 24*(tempreg1+2)/(tempreg2+2)/2;
+    // R8_CMD3
 }
 
 /*********************************************************************
@@ -47,9 +80,13 @@ uint32_t GetSysClock(void)
  *
  * @return  是否开启
  */
-uint8_t SYS_GetInfoSta(SYS_InfoStaTypeDef i)
+uint32_t SYS_GetInfoSta(SYS_InfoStaTypeDef info)
 {
-    __nop();
+
+    if(info == n_cores)
+        return (uint32_t)R32_info&0xff00;
+    else 
+        return (uint32_t)R32_info&0x00ff;
 }
 
 /*********************************************************************
@@ -101,61 +138,8 @@ void SYS_RecoverIrq(uint32_t irq_status)
     __nop();
 }
 
-/*********************************************************************
- * @fn      SYS_GetSysTickCnt
- *
- * @brief   获取当前系统(SYSTICK)计数值
- *
- * @param   none
- *
- * @return  当前计数值
- */
-uint32_t SYS_GetSysTickCnt(void)
-{
-    __nop();
-}
 
-/*********************************************************************
- * @fn      WWDG_ITCfg
- *
- * @brief   看门狗定时器溢出中断使能
- *
- * @param   s       - 溢出是否中断
- *
- * @return  none
- */
-void WWDG_ITCfg(FunctionalState s)
-{
-        ;
-}
 
-/*********************************************************************
- * @fn      WWDG_ResetCfg
- *
- * @brief   看门狗定时器复位功能
- *
- * @param   s       - 溢出是否复位
- *
- * @return  none
- */
-void WWDG_ResetCfg(FunctionalState s)
-{
-    ;
-}
-
-/*********************************************************************
- * @fn      WWDG_ClearFlag
- *
- * @brief   清除看门狗中断标志，重新加载计数值也可清除
- *
- * @param   none
- *
- * @return  none
- */
-void WWDG_ClearFlag(void)
-{
-    __nop();
-}
 
 /*********************************************************************
  * @fn      HardFault_Handler
@@ -168,11 +152,11 @@ void WWDG_ClearFlag(void)
  */
 // __attribute__((interrupt("WCH-Interrupt-fast")))
 // __attribute__((section(".highcode")))
-__attribute__((weak)) void
-HardFault_Handler(void)
-{
-    __nop();
-}
+// __attribute__((weak)) void
+// HardFault_Handler(void)
+// {
+//     __nop();
+// }
 
 /*********************************************************************
  * @fn      mDelayuS
@@ -186,31 +170,33 @@ HardFault_Handler(void)
 // __attribute__((section(".highcode"))) 
 void mDelayuS(uint16_t t)
 {
-    uint32_t i;
-#if (FREQ_SYS == 64000000)
-    i = t * 16;
-#elif (FREQ_SYS == 48000000)
-    i = t * 12;
-#elif (FREQ_SYS == 40000000)
-    i = t * 10;
-#elif (FREQ_SYS == 32000000)
-    i = t << 3;
-#elif (FREQ_SYS == 24000000)
-    i = t * 6;
-#elif (FREQ_SYS == 16000000)
-    i = t << 2;
-#elif (FREQ_SYS == 8000000)
-    i = t << 1;
-#elif (FREQ_SYS == 4000000)
-    i = t;
-#elif (FREQ_SYS == 2000000)
-    i = t >> 1;
-#elif (FREQ_SYS == 1000000)
-    i = t >> 2;
-#endif
+    int32_t i;
+// #if (FREQ_SYS == 64000000)
+//     i = t * 16;
+// #elif (FREQ_SYS == 48000000)
+//     i = t * 12;
+// #elif (FREQ_SYS == 40000000)
+//     i = t * 10;
+// #elif (FREQ_SYS == 32000000)
+//     i = t << 3;
+// #elif (FREQ_SYS == 24000000)
+//     i = t * 6;
+// #elif (FREQ_SYS == 16000000)
+//     i = t << 2;
+// #elif (FREQ_SYS == 8000000)
+//     i = t << 1;
+// #elif (FREQ_SYS == 4000000)
+//     i = t;
+// #elif (FREQ_SYS == 2000000)
+//     i = t >> 1;
+// #elif (FREQ_SYS == 1000000)
+//     i = t >> 2;
+// #endif
+    i = t * 11;
     do
     {
         __nop();
+        // ;
     } while (--i);
 }
 
@@ -223,14 +209,14 @@ void mDelayuS(uint16_t t)
  *
  * @return  none
  */
-// __attribute__((section(".highcode"))) 
-void mDelaymS(uint16_t t)
+
+void mDelaymS(int32_t t)
 {
-    uint16_t i;
+    int32_t i;
 
     for (i = 0; i < t; i++)
     {
-        mDelayuS(1000);
+        mDelayuS(1150);
     }
 }
 

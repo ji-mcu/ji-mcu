@@ -16,8 +16,41 @@ extern "C"
 {
 #endif
 
-#include "soc_common.h"
+#include <string.h>
+#include <stdint.h>
+#include <stdio.h>
+#include "hal/pulp_io.h"
+#include "core_riscv.h"
+#include "core_SFR.h"
 
+#define     D2A_DAC12_EN    2 
+#define     D2A_DAC12_SEL_1   (uint16_t)0x00ff
+#define     D2A_DAC12_SEL_2   (uint16_t)0x0f00
+#define     D2A_PLL_ITVCO   (uint8_t)0xf
+#define     D2A_PLL_PD      (uint8_t)1<<6
+#define     D2A_PLL_PDMCK   (uint8_t)1<<5
+#define     D2A_PLL_PLBYP   (uint8_t)1<<4
+#define     D2A_PLL_PLCC    (uint8_t)0xf
+#define     D2A_PLL_PLLR    (uint8_t)0x1f
+#define     D2A_PLL_PLLRC   (uint8_t)1<<4
+#define     D2A_PLL_PLM     (uint8_t)0x7f
+#define     D2A_PLL_PLN     (uint8_t)0x3f
+#define     D2A_PLL_RSTB    (uint8_t)1<<5
+#define     D2A_PLL_TESTEN  (uint8_t)1<<6
+#define     D2A_ICELL_TRIM  (uint8_t)0x1f
+#define     D2A_BGR_TRIM    (uint8_t)0xe0
+// #define     D2A_ADCCLK_12M  (uint8_t)0xff
+#define     D2A_ADC_CHANELSEL   0
+#define     D2A_SARADC_PD       1//adc的时钟使能，默认为1
+#define     D2A_LDO18_ENB   (uint8_t)1<<3
+// #define     A2D_ADC_EOC     (uint8_t)1<<
+// #define     A2D_ADOUT
+
+#define SOC_RST         0x1a1010cc
+#define SOC_Fetchen     0x1a101008
+#define SOC_boot_addr   0x1a101004
+
+#define SET_BIT(REG, BIT) ((REG) |= (BIT))
     typedef enum
     {
         TIM_CLOCK_1M = 1000000,
@@ -53,83 +86,57 @@ extern "C"
      */
     typedef enum
     {
-        INFO_ROM_READ = 0, // FlashROM 代码和数据区 是否可读
-        INFO_RESET_EN = 2, // RST#外部手动复位输入功能是否开启
-        INFO_BOOT_EN,      // 系统引导程序 BootLoader 是否开启
-        INFO_DEBUG_EN,     // 系统仿真调试接口是否开启
-        INFO_LOADER,       // 当前系统是否处于Bootloader 区
-        STA_SAFEACC_ACT,   // 当前系统是否处于安全访问状态，否则RWA属性区域不可访问
-
+        n_cores , 
+        n_clusters , 
     } SYS_InfoStaTypeDef;
 
-
+#define soc_boorctrl(boot_addr) (R32_boot_addr = boot_addr)
 
 
 /**
- * @brief  获取芯片ID类，一般为固定值
- */
-#define SYS_GetChipID() R8_CHIP_ID
-
-/**
- * @brief  获取安全访问ID，一般为固定值
- */
-#define SYS_GetAccessID() R8_SAFE_ACCESS_ID
-
-    /**
-     * @brief   配置系统运行时钟
-     *
-     * @param   sc      - 系统时钟源选择 refer to SYS_CLKTypeDef
-     */
-    void SetSysClock(uint16_t sc);
-
-    /**
-     * @brief   获取当前系统时钟
-     *
-     * @return  Hz
-     */
-    uint32_t GetSysClock(void);
-
-    /**
-     * @brief   获取当前系统信息状态
-     *
-     * @param   i       - refer to SYS_InfoStaTypeDef
-     *
-     * @return  是否开启
-     */
-    uint8_t SYS_GetInfoSta(SYS_InfoStaTypeDef i);
-
-/**
- * @brief   获取系统上次复位状态
+ * @brief   配置系统运行时钟
  *
- * @return  refer to SYS_ResetStaTypeDef
+ * @param   sc      - 系统时钟源选择 refer to SYS_CLKTypeDef
  */
-#define SYS_GetLastResetSta() (R8_RESET_STATUS & RB_RESET_FLAG)
-
-    /**
-     * @brief   执行系统软件复位
-     */
-    void SYS_ResetExecute(void);
-
+void SetSysClock(TIMClock_TypeDef sysfreq);
 /**
- * @brief   设置复位保存寄存器的值，不受手动复位、 软件复位、 看门狗复位或者普通唤醒复位的影响
+ * @brief   获取当前系统时钟
+ *
+ * @return  Hz
+ */
+uint32_t GetSysClock(void);
+/**
+ * @brief   获取当前系统信息状态
  *
  * @param   i       - refer to SYS_InfoStaTypeDef
+ *
+ * @return  是否开启
  */
-#define SYS_ResetKeepBuf(d) (R8_GLOB_RESET_KEEP = d)
+uint32_t SYS_GetInfoSta(SYS_InfoStaTypeDef info);
 
-    /**
-     * @brief   关闭所有中断，并保留当前中断值
-     *
-     * @param   pirqv   - 当前保留中断值
-     */
-    void SYS_DisableAllIrq(uint32_t *pirqv);
+/**
+ * @brief   执行系统软件复位
+ */
+void SYS_ResetExecute(void);
 
-    /**
-     * @brief   恢复之前关闭的中断值
-     *
-     * @param   irq_status  - 当前保留中断值
-     */
-    void SYS_RecoverIrq(uint32_t irq_status);
+/**
+ * @brief   
+ */
+void SystemInit(void);
+
+/**
+ * @brief   关闭所有中断，并保留当前中断值
+ *
+ * @param   pirqv   - 当前保留中断值
+ */
+void SYS_DisableAllIrq(uint32_t *pirqv);
+
+/**
+ * @brief   恢复之前关闭的中断值
+ *
+ * @param   irq_status  - 当前保留中断值
+ */
+void SYS_RecoverIrq(uint32_t irq_status);
 
     /**
      * @brief   获取当前系统(SYSTICK)计数值
@@ -183,7 +190,7 @@ extern "C"
      *
      * @param   t       - 时间参数
      */
-    void mDelaymS(uint16_t t);
+    void mDelaymS(int32_t t);
 
     // /**
     //  * @brief 进入安全访问模式.

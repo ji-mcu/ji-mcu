@@ -10,8 +10,6 @@
 
 void soc_myputchar(unsigned char chr)
 {
-    // volatile char uart_fifo0_ctrl;
-    // uart_fifo0_ctrl = UART1_FIFO_CTRL;
     UART0_SendByte(chr);
 }
 

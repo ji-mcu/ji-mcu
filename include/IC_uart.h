@@ -37,10 +37,10 @@ extern "C"
  */
 typedef enum
 {
-    UART_4BYTE_TRIG = 0, // 4字节
-    UART_5BYTE_TRIG,     // 5字节
+    UART_5BYTE_TRIG = 0, // 5字节
     UART_6BYTE_TRIG,     // 6字节
     UART_7BYTE_TRIG,     // 7字节
+    UART_8BYTE_TRIG,     // 8字节
 } UARTByteTypeDef;
 
 
@@ -57,16 +57,19 @@ typedef enum uart_stop_bit
 /* Uart Init structure definition  */
 typedef struct
 {
-    uint32_t uart_ClockSpeed; /* Specifies the clock frequency.
-                                This parameter must be set to a value lower than 400kHz */
+    uint32_t uart_ClockSpeed;
 
-    uint16_t Uart_Mode;        /* Specifies the I2C mode.
-                                 This parameter can be a value of @ref I2C_mode */
-    uint16_t Uart_count ;       //  This parameter can be a 7-bit or 10-bit address. */
+    uint8_t uart_ByeCFG;//choose 7
+    uint8_t uart_StopBit;//cho0se 0
+    uint16_t uart_Txen;
+    uint16_t uart_Rxen;
 
-    uint32_t Uart_rx_addr; /* destination address */
+    uint8_t uart_rx_size ;//can not max 256
+    uint8_t uart_tx_size; // can not max 256
 
-    uint32_t Uart_tx_addr;     /* destination address */
+    uint32_t uart_rx_addr;
+
+    uint32_t uart_tx_addr;
 
 } Uart_InitTypeDef;
 
@@ -74,7 +77,7 @@ typedef struct
 /**
  * @brief   串口默认初始化配置
  */
-void UART0_DefInit(uint32_t baudrate, uint32_t byte_num);
+void UART0_DefInit(Uart_InitTypeDef *uart_InitStruct);
 
 /**
  * @brief   串口波特率配置
@@ -83,26 +86,27 @@ void UART0_DefInit(uint32_t baudrate, uint32_t byte_num);
  */
 void UART0_BaudRateCfg(uint32_t baudrate);
 
-/**
- * @brief   串口字节触发中断配置
- *
- * @param   b       - 触发字节数 refer to UARTByteTRIGTypeDef
- */
-// void UART0_ByteTrigCfg(UARTByteTypeDef b);
+void uart_StructInit(Uart_InitTypeDef *uart_InitStruct);
+    /**
+     * @brief   串口字节触发中断配置
+     *
+     * @param   b       - 触发字节数 refer to UARTByteTRIGTypeDef
+     */
+    // void UART0_ByteTrigCfg(UARTByteTypeDef b);
 
-/**
- * @brief   串口中断配置
- *
- * @param   s       - 中断控制状态，是否使能相应中断
- * @param   i       - 中断类型
- *
- */
-// void UART0_INTCfg(FunctionalState s, uint8_t i);
+    /**
+     * @brief   串口中断配置
+     *
+     * @param   s       - 中断控制状态，是否使能相应中断
+     * @param   i       - 中断类型
+     *
+     */
+    // void UART0_INTCfg(FunctionalState s, uint8_t i);
 
-/**
- * @brief   串口软件复位
- */
-void UART0_Reset(void);
+    /**
+     * @brief   串口软件复位
+     */
+    void UART0_Reset(void);
 
 /**
  * @brief   清除当前rx准备发送数据
@@ -182,7 +186,7 @@ uint16_t UART0_RecvString(uint16_t l);
 /**
  * @brief   串口默认初始化配置
  */
-void UART1_DefInit(uint32_t baudrate, uint32_t byte_num);
+void UART0_DefInit(Uart_InitTypeDef *uart_InitStruct);
 
 /**
  * @brief   串口波特率配置

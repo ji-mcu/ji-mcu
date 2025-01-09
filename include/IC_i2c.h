@@ -1,5 +1,5 @@
 /********************************** (C) COPYRIGHT  *******************************
- * File Name          : IC_i2c.h
+ * File Name          : IC_i2c.h 
  * Author             : huang jin
  * Version            : V0.0
  * Date               : 2024/09/21
@@ -13,28 +13,41 @@ extern "C"
 {
 #endif
 
-#include "soc_common.h"
+// #include "soc_common.h"
+#include <string.h>
+#include <stdint.h>
+#include <stdio.h>
+#include "core_sys.h"
+// #include "IC_udma.h"
+#include "soc_event.h"
+#include "core_riscv.h"
 
-    /* I2C Init structure definition  */
-    typedef struct
-    {
-        uint32_t I2C_ClockSpeed; /* Specifies the clock frequency.
-                                    This parameter must be set to a value lower than 400kHz */
+ /* I2C Init structure definition  */
+ typedef struct
+ {
+     uint32_t I2C_ClockSpeed; /*This parameter must be set to a value lower than 3.4MHz */
+     uint8_t  I2C_bytes     ; /* higher than 0 but lower than 256*/
+     uint8_t  I2C_Direction ;  /* can be set as read= 0x60 or wirte= 0x80*/
+     uint8_t  I2C_Device_addr   ;
+     uint16_t I2C_OwnAddress1; /* Specifies the first device own address.   This parameter can be a 7-bit or 10-bit address. */
+    //  uint32_t I2C_addr;        /* destination address */
+     // uint32_t I2C_tx_addr; /* destination address */
+ } I2C_InitTypeDef;
+ /* I2C Init structure definition  */
+ typedef enum
+ {
+    Standard_Mode=100000,
+    Fast_Mode    =400000,
+    High_speed_mode=3400000,
+ } I2C_Baudrate_TypeDef;
 
-        uint16_t I2C_Mode; /* Specifies the I2C mode.
-                              This parameter can be a value of @ref I2C_mode */
-        uint16_t I2C_OwnAddress1; /* Specifies the first device own address.
-                                     This parameter can be a 7-bit or 10-bit address. */
-        uint32_t I2C_rx_addr; /* destination address */
-        uint32_t I2C_tx_addr; /* destination address */
-
-    } I2C_InitTypeDef;
-
+#define I2C_Baudrate    Standard_Mode
+#define I2C_BYTES       8
 /* I2C_mode */
 #define I2C_Mode_Slave ((uint8_t)0x00)
 #define I2C_Mode_Master ((uint8_t)0x20)
 
-
+#define TIME_OUT        (uint32_t)0x64 
 /* I2C_acknowledgement */
 #define I2C_Ack_Enable ((uint8_t)0x04)
 #define I2C_Ack_Disable ((uint8_t)0x00)
@@ -59,41 +72,41 @@ extern "C"
 /* I2C_interrupts_definition */
 
 /*I2C status flag*/
-#define I2C_FLAG_BUSY ((uint8_t)1<<0)
-#define I2C_FLAG_al ((uint8_t)1<<1)
-#define I2C_FLAG_ack ((uint8_t)1<<3)
-#define I2C_FLAG_data_store_req ((uint8_t)1<<4)
+#define I2C_FLAG_BUSY               ((uint8_t)1<<0)
+#define I2C_FLAG_al                 ((uint8_t)1<<1)
+#define I2C_FLAG_ack                ((uint8_t)1 << 3)
+#define I2C_FLAG_data_store_req     ((uint8_t)1 << 4)
 
-
+#define I2C_CMD_OFFSET       4
 //Udma control
-#define I2C_CMD_START       (uint8_t)0x02
-#define I2C_CMD_STOP        (uint8_t)0x21
-#define I2C_CMD_RD_ACK      (uint8_t)0x41
-#define I2C_CMD_RD_NACK     (uint8_t)0x61
-#define I2C_CMD_WR          (uint8_t)0x81
-#define I2C_CMD_WAIT        (uint8_t)0xA1
-#define I2C_CMD_RPT         (uint8_t)0xC1
-#define I2C_CMD_CFG         (uint8_t)0xE1
-#define I2C_CMD_WAIT_EV     (uint8_t)0x11
-/****************I2C Master Events (Events grouped in order of communication)********************/
+#define I2C_CMD_START       (0x0<< I2C_CMD_OFFSET)
+#define I2C_CMD_STOP        (0x2<< I2C_CMD_OFFSET)
+#define I2C_CMD_RD_ACK      (0x4<< I2C_CMD_OFFSET)
+#define I2C_CMD_RD_NACK     (0x6<< I2C_CMD_OFFSET)
+#define I2C_CMD_WR          (0x8<< I2C_CMD_OFFSET)
+#define I2C_CMD_WAIT        (0xA<< I2C_CMD_OFFSET)
+#define I2C_CMD_RPT         (0xC<< I2C_CMD_OFFSET)
+#define I2C_CMD_CFG         (0xE<< I2C_CMD_OFFSET)
+#define I2C_CMD_WAIT_EV     (0x1<< I2C_CMD_OFFSET)
 
-/******************I2C Slave Events (Events grouped in order of communication)******************/
 
-void I2C_Init(RV_i2c_t *I2Cx, I2C_InitTypeDef *I2C_InitStruct , I2C_Ptr *I2C_px);
+
+
+     /****************I2C Master Events (Events grouped in order of communication)********************/
+
+     /******************I2C Slave Events (Events grouped in order of communication)******************/
+
+void I2C_Init(I2C_InitTypeDef *I2C_InitStruct);
 void I2C_StructInit(I2C_InitTypeDef *I2C_InitStruct);
-void I2C_Cmd(RV_i2c_t *I2Cx, uint8_t data_num, uint32_t i2c_addr, Function Newfunction, FunctionalState NewState);
-void I2C_GenerateSTART(I2C_Ptr *I2C_px, uint8_t udma_addr_count, FunctionalState NewState);
-void I2C_GenerateSTOP(I2C_Ptr *I2C_px, uint8_t udma_addr_count, FunctionalState NewState);
-void I2C_AcknowledgeConfig(I2C_Ptr *I2C_px, uint8_t udma_addr_count, FunctionalState NewState);
-void I2C_OwnAddress2Config(RV_i2c_t *I2Cx, uint8_t Address);
-// void I2C_GeneralCallCmd(RV_i2c_t *I2Cx, FunctionalState NewState);
-void I2C_ITConfig(RV_i2c_t *I2Cx, uint16_t I2C_IT, FunctionalState NewState);
-uint8_t I2C_SendData(RV_i2c_t *I2Cx, I2C_Ptr *I2C_px, uint8_t udma_addr_count, uint8_t *Data, uint8_t sizeof_data);
-uint8_t I2C_ReceiveData(RV_i2c_t *I2Cx, I2C_Ptr *I2C_px, uint8_t udma_addr_count, uint8_t sizeof_data);
-void I2C_Send7bitAddress(RV_i2c_t *I2Cx, uint8_t Address, uint8_t I2C_Direction);
+void i2c_send_cmd(uint32_t baudrate, uint8_t data_num, uint32_t i2cbase, Function Newfunction);
+uint8_t I2C_get_status(RV_i2c_t *I2Cx);
+uint8_t I2C_busy(RV_i2c_t *I2Cx);
+void I2C_SendData(uint32_t i2cbase, uint32_t u8Data, uint8_t data_num);
+void I2C_ReceiveData(uint32_t i2cbase, uint32_t u8Data, uint8_t data_num);
 uint16_t I2C_ReadRegister(RV_i2c_t *I2Cx, uint8_t I2C_Register);
 uint32_t I2C_udma_keyword_reg(uint32_t i2c_addr, uint8_t udma_addr_count);
 void I2C_SoftwareResetCmd(RV_i2c_t *I2Cx, FunctionalState NewState);
+void i2c_handler();
 
 /*********************************************************
  *

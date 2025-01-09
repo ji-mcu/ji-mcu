@@ -1,8 +1,8 @@
 /********************************** (C) COPYRIGHT *******************************
  * File Name          : uart1.c
  * Author             : huangjin
- * Version            : V0.1
- * Date               : 2024/10/1
+ * Version            : V0.2
+ * Date               : 2024/10/31
  * Description
  *********************************************************************************
  *******************************************************************************/
@@ -18,31 +18,38 @@
  *
  * @return  none
  */
-void UART1_DefInit(uint32_t baudrate, uint32_t byte_num)
+void UART1_DefInit(Uart_InitTypeDef *uart_InitStruct)
 {
-    uint32_t byte_num_temp=0;
-    byte_num_temp = byte_num ;
-    UART1_BaudRateCfg(115200);
+    // UART1_BaudRateCfg(baudrate);
+    uint32_t baudrate = 0;
+    baudrate = TIM_CLOCK_64M / uart_InitStruct->uart_ClockSpeed - 1;
+    R32_uart1_setup |= (uint32_t)(baudrate << 16);
+    R32_uart1_setup |= (uint32_t)uart_InitStruct->uart_StopBit;
+    R32_uart1_setup |= (uint32_t)(uart_InitStruct->uart_ByeCFG << 1);
+    // R32_uart1_setup |= (uint16_t)UART_STOP_BIT_1<<3;//小心此处uin16类型转换出错
+    R32_uart1_setup |= (uint32_t)uart_InitStruct->uart_Rxen;
+    R32_uart1_setup |= (uint32_t)uart_InitStruct->uart_Txen;
 
-    R32_uart1_setup |= (uint16_t)Setup_parity_en;
-    R32_uart1_setup |= (uint16_t)UART_7BYTE_TRIG << 1;
-    R32_uart1_setup |= (uint16_t)UART_STOP_BIT_1 << 3; // 小心此处uin16类型转换出错
-    R32_uart1_setup |= (uint16_t)Setup_uart_en_rx;
-    R32_uart1_setup |= (uint16_t)Setup_uart_en_tx;
+    R32_uart1_rx_addr = uart_InitStruct->uart_rx_addr;
+    R32_uart1_tx_addr = uart_InitStruct->uart_tx_addr;
+    // R32_uart1_tx_addr = RV_Udma_uart_RX_ADDR;
 
-    R32_uart1_rx_addr = R8_uart_rx_data;
-    R32_uart1_tx_addr = R8_uart_tx_data;
-    if (byte_num_temp != 0)
-    {
-        R32_uart1_rxsize = (uint16_t)byte_num;
-        R32_uart1_tx_size = (uint16_t)byte_num;
-    }
-    else
-    {
-        R32_uart1_rxsize = 1;
-        R32_uart1_tx_size = 1;
-    }
+    R32_uart1_rx_size = (uint32_t)uart_InitStruct->uart_rx_size;
+    R32_uart1_tx_size = (uint32_t)uart_InitStruct->uart_tx_size;
 }
+
+// void uart_StructInit(Uart_InitTypeDef *uart_InitStruct)
+// {
+//     uart_InitStruct->uart_ClockSpeed = 115200;
+//     uart_InitStruct->uart_ByeCFG = UART_7BYTE_TRIG;
+//     uart_InitStruct->uart_StopBit = UART_STOP_BIT_1;
+//     uart_InitStruct->uart_Txen = Setup_uart_en_tx;
+//     uart_InitStruct->uart_Rxen = Setup_uart_en_rx;
+//     uart_InitStruct->uart_rx_size = 1;
+//     uart_InitStruct->uart_tx_size = 1;
+//     uart_InitStruct->uart_rx_addr = RV_Udma_uart_RX_ADDR;
+//     uart_InitStruct->uart_tx_addr = RV_Udma_uart_TX_ADDR;
+// }
 
 /*********************************************************************
  * @fn      UART1_BaudRateCfg
@@ -57,9 +64,10 @@ void UART1_BaudRateCfg(uint32_t baudrate)
 {
     uint32_t x;
 
-    x = TIM_CLOCK_64M / baudrate;
+    x = TIM_CLOCK_64M / baudrate - 1;
+    // x=baudrate;
 
-    R32_uart1_setup = (uint16_t)x << 16;
+    R32_uart1_setup |= (uint32_t)x << 16;
 }
 
 /*********************************************************************
@@ -92,7 +100,7 @@ void UART1_INTCfg(FunctionalState s, uint8_t i)
 }
 
 /*********************************************************************
- * @fn      UART0_Reset
+ * @fn      UART1_Reset
  *
  * @brief   串口软件复位
  *
@@ -105,7 +113,7 @@ void UART1_Reset(void)
 }
 
 /*********************************************************************
- * @fn      UART0_SendByte
+ * @fn      UART1_SendByte
  *
  * @brief   串口单字节发送
  *
@@ -116,9 +124,11 @@ void UART1_Reset(void)
 
 void UART1_SendByte(uint8_t data)
 {
-    
+    while ((R32_uart1_status & TX_FIFO_EMP) == 1)
+    {
+        ;
+    }
     R8_uart_tx_data = data;
-    // pad_uart0->pad_uart_tx_data_reg[0] = data;
     R32_uart1_tx_cfg |= CFG_en;
 }
 
@@ -134,17 +144,21 @@ void UART1_SendByte(uint8_t data)
  */
 void UART1_SendString(uint8_t *buf, uint16_t l)
 {
-    uint16_t len = l;
-    R32_uart1_tx_size = len;
-    while (len)
+    uint16_t len = 0;
+    // R32_uart1_tx_size=len;
+    for (len = 0; len < l; len++)
     {
-        R32_uart1_tx_cfg |= CFG_en;
-        if (!(R32_uart1_status && TX_FIFO_EMP))
+        // R32_uart1_tx_cfg |= CFG_Clr;
+        if ((R32_uart1_status & TX_FIFO_EMP) == 1)
         {
-            R8_uart_tx_data = *buf++;
-            len--;
+            // UART1_SendByte(buf[len]);
+            // *((volatile uint32_t *)((&R8_uart_tx_data) + len)) = buf[len];
+            udma_tx_ptr4->uart_data_reg[len] = buf[len];
+            // R8_uart_tx_data = buf[len];
+            // DelayUs(100);
         }
     }
+    R32_uart1_tx_cfg |= CFG_en;
 }
 /*********************************************************************
 /**
@@ -154,11 +168,18 @@ void UART1_SendString(uint8_t *buf, uint16_t l)
  */
 uint8_t UART1_RecvByte()
 {
-
-    // uint8_t data=pad_uart0->pad_uart_rx_data_reg[0];
-    uint8_t data = R8_uart_rx_data;
+    // uint8_t data=0;
+    uint8_t flag = 0;
     R32_uart1_rx_cfg |= CFG_en;
-    return data;
+    while ((R32_uart1_status & RX_DATA_RDY) == 0)
+    {
+
+        // data = R8_uart_rx_data;
+        flag = 1;
+    }
+    // uint8_t data=pad_uart1->pad_uart_rx_data_reg[0];
+
+    return flag;
 }
 
 /*********************************************************************
@@ -172,20 +193,17 @@ uint8_t UART1_RecvByte()
  */
 uint16_t UART1_RecvString(uint16_t l)
 {
-    // uint16_t len = 0;
-    uint8_t buf[l];
 
-    uint16_t len = l;
-    R32_uart1_tx_size = len;
-    while (len <= l)
+    uint8_t len = 0;
+    R32_uart1_rx_cfg |= CFG_en;
+    while ((R32_uart1_status & RX_DATA_RDY) == 0)
     {
-        R32_uart1_rx_cfg |= CFG_en;
-        if (!(R32_uart1_status && RX_DATA_RDY))
-        {
-            buf[len] = R8_uart_rx_data;
 
-            len++;
-        }
+        // data = R8_uart_rx_data;
+        len++;
     }
-    return *buf;
+    // uint8_t data=pad_uart1->pad_uart_rx_data_reg[0];
+    R32_uart1_tx_size = len;
+
+    return len;
 }

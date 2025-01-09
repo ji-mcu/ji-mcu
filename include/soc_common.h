@@ -58,6 +58,8 @@ extern "C"
 // #define CAB_LSIFQ 32000
 // #endif
 
+
+// #include "hal/pulp_io.h"
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -65,6 +67,7 @@ extern "C"
 #include "core_riscv.h"
 #include "core_SFR.h"
 #include "core_sys.h"
+#include "hal/riscv/riscv_v5.h"
 #include "soc_event.h"
 #include "IC_gpio.h"
 #include "IC_PWM.h"
@@ -73,15 +76,18 @@ extern "C"
 #include "IC_RCC.h"
 #include "IC_timer.h"
 #include "soc_printf.h"
+#include "IC_lin.h"
+#include "IC_adc.h"
+#include "IC_dac.h"
+#include "IC_I2S.h"
+#include "IC_udma.h"
+#include "IC_SPI.h"
+#include "core_riscv_encoding.h"
 
 #define DelayMs(x) mDelaymS(x)
 #define DelayUs(x) mDelayuS(x)
 
-#define SOC_RST         0x1a1010cc
-#define SOC_Fetchen     0x1a101008
-#define SOC_boot_addr   0x1a101004
 
-#define SET_BIT(REG, BIT) ((REG) |= (BIT))
 
 #ifdef __cplusplus
 }

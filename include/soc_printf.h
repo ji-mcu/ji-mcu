@@ -11,6 +11,7 @@ extern "C"
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
 #define soc_log_printf(fmt, args...) soc_myprintf(fmt, ##args)
+//soc printf use uart0
 #define soc_printf(fmt, args...) soc_log_printf(fmt, ##args)
 
     // extern int soc_myprintf(char *fmt, ...);
